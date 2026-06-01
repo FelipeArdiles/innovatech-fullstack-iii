@@ -166,26 +166,6 @@ El repositorio usa **GitHub Flow simplificado** sobre `master` (rama principal e
 3. Integrar vía merge local o pull request hacia `master` (sin push forzado a `master`)
 4. No hay rama `develop` ni scripts Git Flow en el repo; convención alineada al historial existente (`git log --oneline`)
 
-## Documentación OpenAPI (Swagger)
-
-SpringDoc expone UI y JSON en cada servicio. En desarrollo local (sin gateway):
-
-| Servicio | Swagger UI | OpenAPI JSON |
-|----------|------------|--------------|
-| BFF | http://localhost:8081/swagger-ui.html | http://localhost:8081/v3/api-docs |
-| ms-usuarios | http://localhost:8082/swagger-ui.html | http://localhost:8082/v3/api-docs |
-| ms-proyectos | http://localhost:8083/swagger-ui.html | http://localhost:8083/v3/api-docs |
-
-Vía **API Gateway** (rutas públicas `/docs/**`, sin JWT):
-
-| Servicio | Swagger UI |
-|----------|------------|
-| BFF | http://localhost:8080/docs/bff/swagger-ui.html |
-| ms-usuarios | http://localhost:8080/docs/ms-usuarios/swagger-ui.html |
-| ms-proyectos | http://localhost:8080/docs/ms-proyectos/swagger-ui.html |
-
-La API de negocio (`/api/**`) sigue requiriendo `Authorization: Bearer <token>` de Keycloak. El BFF documenta el esquema JWT en Swagger.
-
 ## Módulos
 
 - `eureka-server` – Service discovery
