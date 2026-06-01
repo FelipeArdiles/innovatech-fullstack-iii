@@ -3,6 +3,7 @@ package cl.innovatech.bff_gateway.client;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -15,7 +16,7 @@ public class MicroserviceClient {
 	private final RestClient usuariosClient;
 	private final RestClient proyectosClient;
 
-	public MicroserviceClient(RestClient.Builder restClientBuilder) {
+	public MicroserviceClient(@Qualifier("loadBalancedRestClientBuilder") RestClient.Builder restClientBuilder) {
 		this.usuariosClient = restClientBuilder.baseUrl("http://ms-usuarios").build();
 		this.proyectosClient = restClientBuilder.baseUrl("http://ms-proyectos").build();
 	}
