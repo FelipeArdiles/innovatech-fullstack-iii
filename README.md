@@ -2,6 +2,8 @@
 
 Arquitectura de microservicios para la gestión integral de proyectos tecnológicos.
 
+**¿Primera vez con el proyecto?** Sigue la [guía de inicio paso a paso](docs/GUIA_INICIO.md) (Docker Compose o local, login Keycloak y URLs en el navegador).
+
 ## Arquitectura
 
 ```
