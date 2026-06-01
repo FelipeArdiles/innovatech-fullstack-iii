@@ -1,0 +1,116 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: innovatech-keycloak
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HTTP_PORT: 8180
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8180
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+    volumes:
+      - ./docker/keycloak/realm-innovatech.json:/opt/keycloak/data/import/realm-innovatech.json
+    ports:
+      - "8180:8180"
+    networks:
+      - innovatech-net
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8180"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: innovatech-eureka
+    environment:
+      SERVER_PORT: 8761
+    ports:
+      - "8761:8761"
+    networks:
+      - innovatech-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8761/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  ms-usuarios:
+    build:
+      context: ./ms-usuarios
+      dockerfile: Dockerfile
+    container_name: innovatech-ms-usuarios
+    environment:
+      SERVER_PORT: 8082
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - innovatech-net
+
+  ms-proyectos:
+    build:
+      context: ./ms-proyectos
+      dockerfile: Dockerfile
+    container_name: innovatech-ms-proyectos
+    environment:
+      SERVER_PORT: 8083
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - innovatech-net
+
+  bff-gateway:
+    build:
+      context: ./bff-gateway
+      dockerfile: Dockerfile
+    container_name: innovatech-bff
+    environment:
+      SERVER_PORT: 8081
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      ms-usuarios:
+        condition: service_started
+      ms-proyectos:
+        condition: service_started
+    networks:
+      - innovatech-net
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: innovatech-api-gateway
+    environment:
+      SERVER_PORT: 8080
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      KEYCLOAK_ISSUER_URI: http://localhost:8180/realms/innovatech
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      bff-gateway:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      - innovatech-net
+
+networks:
+  innovatech-net:
+    driver: bridge
