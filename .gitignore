@@ -1,0 +1,25 @@
+# Entorno y secretos
+.env
+.env.local
+*.env
+!.env.example
+!**/.env.example
+
+# Python venv
+.venv/
+
+# Build artifacts
+**/target/
+**/node_modules/
+**/dist/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+
+# Logs
+*.log
