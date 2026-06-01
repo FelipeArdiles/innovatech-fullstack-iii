@@ -20,6 +20,24 @@ spring:
                 - Path=/api/**
               filters:
                 - StripPrefix=0
+            - id: docs-bff
+              uri: lb://bff-gateway
+              predicates:
+                - Path=/docs/bff/**
+              filters:
+                - RewritePath=/docs/bff/(?<segment>.*), /${segment}
+            - id: docs-ms-usuarios
+              uri: lb://ms-usuarios
+              predicates:
+                - Path=/docs/ms-usuarios/**
+              filters:
+                - RewritePath=/docs/ms-usuarios/(?<segment>.*), /${segment}
+            - id: docs-ms-proyectos
+              uri: lb://ms-proyectos
+              predicates:
+                - Path=/docs/ms-proyectos/**
+              filters:
+                - RewritePath=/docs/ms-proyectos/(?<segment>.*), /${segment}
     discovery:
       enabled: true
 
