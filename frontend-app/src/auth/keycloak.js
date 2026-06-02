@@ -8,13 +8,17 @@ const keycloakConfig = {
 
 const keycloak = new Keycloak(keycloakConfig)
 
-export async function initAuth() {
-  const authenticated = await keycloak.init({
-    onLoad: 'login-required',
-    pkceMethod: 'S256',
-    checkLoginIframe: false,
-  })
-  return authenticated
+let initPromise = null
+
+export function initAuth() {
+  if (!initPromise) {
+    initPromise = keycloak.init({
+      onLoad: 'login-required',
+      pkceMethod: 'S256',
+      checkLoginIframe: false,
+    })
+  }
+  return initPromise
 }
 
 export function getToken() {
