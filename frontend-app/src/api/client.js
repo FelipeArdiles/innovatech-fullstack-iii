@@ -1,4 +1,4 @@
-import { getToken, refreshToken } from './keycloak'
+import { getToken, refreshToken } from '../auth/keycloak'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
@@ -10,7 +10,15 @@ async function authFetch(path, options = {}) {
     Authorization: `Bearer ${token}`,
     ...options.headers,
   }
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers })
+  let response
+  try {
+    response = await fetch(`${API_URL}${path}`, { ...options, headers })
+  } catch (err) {
+    const hint = err?.message === 'Load failed' || err?.name === 'TypeError'
+      ? ' (verifica que Docker exponga el API en ' + API_URL + ')'
+      : ''
+    throw new Error((err?.message || 'Error de red') + hint)
+  }
   if (!response.ok) {
     const message = await response.text()
     throw new Error(message || `Error ${response.status}`)

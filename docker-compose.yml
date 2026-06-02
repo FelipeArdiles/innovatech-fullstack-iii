@@ -88,6 +88,12 @@ services:
         condition: service_started
     networks:
       - innovatech-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 45s
 
   api-gateway:
     build:
@@ -105,11 +111,17 @@ services:
       eureka-server:
         condition: service_healthy
       bff-gateway:
-        condition: service_started
+        condition: service_healthy
     ports:
       - "8080:8080"
     networks:
       - innovatech-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
 
 networks:
   innovatech-net:
