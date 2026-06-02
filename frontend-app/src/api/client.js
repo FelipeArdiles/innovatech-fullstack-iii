@@ -31,8 +31,22 @@ async function authFetch(path, options = {}) {
 
 export const api = {
   getDashboard: () => authFetch('/api/dashboard'),
+
   getUsuarios: () => authFetch('/api/usuarios'),
+  getUsuario: (id) => authFetch(`/api/usuarios/${id}`),
+  createUsuario: (data) =>
+    authFetch('/api/usuarios', { method: 'POST', body: JSON.stringify(data) }),
+  updateUsuario: (id, data) =>
+    authFetch(`/api/usuarios/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteUsuario: (id) =>
+    authFetch(`/api/usuarios/${id}`, { method: 'DELETE' }),
+
   getProyectos: () => authFetch('/api/proyectos'),
-  createUsuario: (data) => authFetch('/api/usuarios', { method: 'POST', body: JSON.stringify(data) }),
-  createProyecto: (data) => authFetch('/api/proyectos', { method: 'POST', body: JSON.stringify(data) }),
+  getProyecto: (id) => authFetch(`/api/proyectos/${id}`),
+  createProyecto: (data) =>
+    authFetch('/api/proyectos', { method: 'POST', body: JSON.stringify(data) }),
+  updateProyecto: (id, data) =>
+    authFetch(`/api/proyectos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteProyecto: (id) =>
+    authFetch(`/api/proyectos/${id}`, { method: 'DELETE' }),
 }
