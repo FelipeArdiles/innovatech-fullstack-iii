@@ -14,8 +14,23 @@ spring:
       server:
         webmvc:
           routes:
+            - id: api-trabajadores
+              uri: lb://ms-usuarios
+              order: 0
+              predicates:
+                - Path=/api/trabajadores,/api/trabajadores/**
+              filters:
+                - RewritePath=/api/trabajadores(?<segment>/.*)?, /api/usuarios${segment}
+            - id: api-tareas
+              uri: lb://ms-tareas
+              order: 1
+              predicates:
+                - Path=/api/tareas,/api/tareas/**
+              filters:
+                - StripPrefix=0
             - id: bff
               uri: lb://bff-gateway
+              order: 2
               predicates:
                 - Path=/api/**
               filters:
