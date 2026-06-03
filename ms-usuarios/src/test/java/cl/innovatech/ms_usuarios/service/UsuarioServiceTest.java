@@ -29,7 +29,7 @@ class UsuarioServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		usuario = new Usuario(1L, "Ana Torres", "Desarrolladora", "ana@innovatech.cl", 40);
+		usuario = new Usuario(1L, "Ana Torres", "Desarrolladora", "ana@innovatech.cl", 40, 1_200_000L);
 	}
 
 	@Test
@@ -44,7 +44,8 @@ class UsuarioServiceTest {
 	void createPersistsNewUsuario() {
 		when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
 
-		Usuario created = usuarioService.create(new Usuario(null, "Ana Torres", "Desarrolladora", "ana@innovatech.cl", 40));
+		Usuario created = usuarioService.create(
+			new Usuario(null, "Ana Torres", "Desarrolladora", "ana@innovatech.cl", 40, 1_200_000L));
 
 		assertThat(created.getNombre()).isEqualTo("Ana Torres");
 		verify(usuarioRepository).save(any(Usuario.class));
