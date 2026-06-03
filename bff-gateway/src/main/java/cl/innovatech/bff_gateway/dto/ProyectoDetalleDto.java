@@ -6,11 +6,12 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProyectoDto {
+public class ProyectoDetalleDto {
 	private Long id;
 	private String nombre;
 	private String estado;
@@ -19,4 +20,11 @@ public class ProyectoDto {
 	private LocalDate fechaInicio;
 	private LocalDate fechaFin;
 	private BigDecimal presupuesto;
+	private boolean atrasado;
+	private int tareasPorHacer;
+	private int tareasEnProgreso;
+	private int tareasHechas;
+	private int horasProyectoEstimadas;
+	private List<TareaDto> tareas;
+	private List<UsuarioDto> trabajadores;
 }

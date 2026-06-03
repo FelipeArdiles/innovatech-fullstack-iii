@@ -6,6 +6,8 @@ import InicioPage from './pages/InicioPage'
 import Dashboard from './pages/Dashboard'
 import TrabajadoresPage from './pages/TrabajadoresPage'
 import ProyectosPage from './pages/ProyectosPage'
+import ProjectDetailPage from './pages/ProjectDetailPage'
+import CapacidadPage from './pages/CapacidadPage'
 import TareasPage from './pages/TareasPage'
 import { Spinner } from './components/ui/LoadingSkeleton'
 import './App.css'
@@ -47,6 +49,8 @@ function App() {
           <Route path="trabajadores" element={<TrabajadoresPage />} />
           <Route path="usuarios" element={<Navigate to="/trabajadores" replace />} />
           <Route path="proyectos" element={<ProyectosPage />} />
+          <Route path="proyectos/:id" element={<ProjectDetailPage />} />
+          <Route path="capacidad" element={<CapacidadPage />} />
           <Route path="tareas" element={<TareasPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 import FlashMessage from '../components/FlashMessage'
 import ConfirmModal from '../components/ConfirmModal'
 import PageHeader from '../components/ui/PageHeader'
 import Button from '../components/ui/Button'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
+import { daysUntil, formatDate, isProyectoAtrasado } from '../utils/projectDates'
 
 const ESTADOS = ['PLANIFICADO', 'EN_PROGRESO', 'COMPLETADO', 'CANCELADO']
 
@@ -22,6 +24,7 @@ function validate(form) {
 }
 
 export default function ProyectosPage() {
+  const navigate = useNavigate()
   const [proyectos, setProyectos] = useState([])
   const [trabajadores, setTrabajadores] = useState([])
   const [loading, setLoading] = useState(true)
@@ -71,7 +74,8 @@ export default function ProyectosPage() {
     setShowForm(true)
   }
 
-  function openEdit(proyecto) {
+  function openEdit(proyecto, e) {
+    e?.stopPropagation()
     setEditingId(proyecto.id)
     setForm({
       nombre: proyecto.nombre ?? '',
@@ -201,44 +205,56 @@ export default function ProyectosPage() {
         </form>
       )}
 
-      {loading && <LoadingSkeleton variant="table" rows={5} />}
+      {loading && <LoadingSkeleton variant="card" rows={4} />}
       {!loading && error && <FlashMessage message={error} type="error" />}
       {!loading && !error && proyectos.length === 0 && (
         <p className="empty-state">No hay proyectos. Crea el primero con el botón superior.</p>
       )}
       {!loading && !error && proyectos.length > 0 && (
-        <div className="table-wrap table-wrap--animated">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Estado</th>
-                <th>Descripción</th>
-                <th>Responsable</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {proyectos.map((p) => (
-                <tr key={p.id}>
-                  <td>{p.id}</td>
-                  <td>{p.nombre}</td>
-                  <td><span className="badge badge--info">{p.estado}</span></td>
-                  <td className="cell-truncate">{p.descripcion}</td>
-                  <td>{trabajadorLabel(p.responsableId)}</td>
-                  <td className="actions-cell">
-                    <Button variant="secondary" size="sm" type="button" onClick={() => openEdit(p)}>
-                      Editar
-                    </Button>
-                    <Button variant="danger" size="sm" type="button" onClick={() => setDeleteTarget(p)}>
-                      Eliminar
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="proyecto-cards">
+          {proyectos.map((p) => {
+            const atrasado = isProyectoAtrasado(p)
+            const dias = daysUntil(p.fechaFin)
+            return (
+              <article
+                key={p.id}
+                className="proyecto-card proyecto-card--clickable"
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate(`/proyectos/${p.id}`)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    navigate(`/proyectos/${p.id}`)
+                  }
+                }}
+              >
+                <div className="proyecto-card__head">
+                  <h3>{p.nombre}</h3>
+                  <span className="badge badge--info">{p.estado?.replace('_', ' ')}</span>
+                </div>
+                <p className="proyecto-card__desc">{p.descripcion}</p>
+                <div className="proyecto-card__meta">
+                  <span>Responsable: {trabajadorLabel(p.responsableId)}</span>
+                  {(p.fechaInicio || p.fechaFin) && (
+                    <span>{formatDate(p.fechaInicio)} – {formatDate(p.fechaFin)}</span>
+                  )}
+                  {dias != null && !atrasado && dias >= 0 && (
+                    <span>{dias} días restantes</span>
+                  )}
+                </div>
+                {atrasado && <span className="badge badge--danger">Atrasado</span>}
+                <div className="proyecto-card__actions" onClick={(e) => e.stopPropagation()}>
+                  <Button variant="secondary" size="sm" type="button" onClick={(e) => openEdit(p, e)}>
+                    Editar
+                  </Button>
+                  <Button variant="danger" size="sm" type="button" onClick={() => setDeleteTarget(p)}>
+                    Eliminar
+                  </Button>
+                </div>
+              </article>
+            )
+          })}
         </div>
       )}
 

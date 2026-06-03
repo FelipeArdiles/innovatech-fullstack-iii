@@ -10,6 +10,7 @@ const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { to: '/trabajadores', label: 'Trabajadores', icon: 'workers' },
   { to: '/proyectos', label: 'Proyectos', icon: 'projects' },
+  { to: '/capacidad', label: 'Capacidad', icon: 'capacity' },
   { to: '/tareas', label: 'Tablero Trello', icon: 'tasks' },
 ]
 

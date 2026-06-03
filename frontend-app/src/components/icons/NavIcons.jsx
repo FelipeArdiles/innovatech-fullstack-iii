@@ -31,6 +31,11 @@ const icons = {
       <path d="M9 12h6M9 8h6M9 16h4" />
     </svg>
   ),
+  capacity: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+      <path d="M18 20V10M12 20V4M6 20v-6" />
+    </svg>
+  ),
   menu: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
       <path d="M4 6h16M4 12h16M4 18h16" />

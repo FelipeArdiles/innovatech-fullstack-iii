@@ -23,3 +23,10 @@
 
 # Logs
 *.log
+
+# Documentos de evaluación (no versionar)
+*.docx
+B EFT Innovatech Solutions Alcance -2.docx
+CASO SEMESTRAL B EFT.docx
+*.pdf
+!docs/**/*.pdf

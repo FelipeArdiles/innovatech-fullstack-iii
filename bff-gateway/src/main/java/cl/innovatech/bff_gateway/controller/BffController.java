@@ -1,6 +1,8 @@
 package cl.innovatech.bff_gateway.controller;
 
+import cl.innovatech.bff_gateway.dto.CapacidadEquipoDto;
 import cl.innovatech.bff_gateway.dto.DashboardDto;
+import cl.innovatech.bff_gateway.dto.ProyectoDetalleDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
 import cl.innovatech.bff_gateway.dto.TareaDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
@@ -85,9 +87,14 @@ public class BffController {
 	}
 
 	@GetMapping("/proyectos/{id}")
-	public ResponseEntity<ProyectoDto> getProyecto(@PathVariable Long id) {
-		ProyectoDto proyecto = bffService.getProyecto(id);
+	public ResponseEntity<ProyectoDetalleDto> getProyecto(@PathVariable Long id) {
+		ProyectoDetalleDto proyecto = bffService.getProyectoDetalle(id);
 		return proyecto != null ? ResponseEntity.ok(proyecto) : ResponseEntity.notFound().build();
+	}
+
+	@GetMapping("/equipo/capacidad")
+	public CapacidadEquipoDto getCapacidadEquipo() {
+		return bffService.getCapacidadEquipo();
 	}
 
 	@PostMapping("/proyectos")

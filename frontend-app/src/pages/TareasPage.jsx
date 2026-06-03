@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import FlashMessage from '../components/FlashMessage'
 import ConfirmModal from '../components/ConfirmModal'
@@ -32,10 +33,12 @@ function validate(form) {
 }
 
 export default function TareasPage() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const proyectoFromUrl = searchParams.get('proyectoId') || ''
   const [tareas, setTareas] = useState([])
   const [proyectos, setProyectos] = useState([])
   const [trabajadores, setTrabajadores] = useState([])
-  const [filtroProyecto, setFiltroProyecto] = useState('')
+  const [filtroProyecto, setFiltroProyecto] = useState(proyectoFromUrl)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [flash, setFlash] = useState('')
@@ -69,8 +72,21 @@ export default function TareasPage() {
   }, [filtroProyecto])
 
   useEffect(() => {
+    setFiltroProyecto(proyectoFromUrl)
+  }, [proyectoFromUrl])
+
+  useEffect(() => {
     loadData()
   }, [loadData])
+
+  function handleFiltroProyecto(value) {
+    setFiltroProyecto(value)
+    if (value) {
+      setSearchParams({ proyectoId: value })
+    } else {
+      setSearchParams({})
+    }
+  }
 
   function showFlash(message, type = 'success') {
     setFlash(message)
@@ -229,7 +245,7 @@ export default function TareasPage() {
             <select
               className="filter-select"
               value={filtroProyecto}
-              onChange={(e) => setFiltroProyecto(e.target.value)}
+              onChange={(e) => handleFiltroProyecto(e.target.value)}
             >
               <option value="">Todos los proyectos</option>
               {proyectos.map((p) => (

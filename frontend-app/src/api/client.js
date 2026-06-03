@@ -52,6 +52,8 @@ export const api = {
 
   getProyectos: () => authFetch('/api/proyectos'),
   getProyecto: (id) => authFetch(`/api/proyectos/${id}`),
+  getProyectoDetalle: (id) => authFetch(`/api/proyectos/${id}`),
+  getCapacidadEquipo: () => authFetch('/api/equipo/capacidad'),
   createProyecto: (data) =>
     authFetch('/api/proyectos', { method: 'POST', body: JSON.stringify(data) }),
   updateProyecto: (id, data) =>
