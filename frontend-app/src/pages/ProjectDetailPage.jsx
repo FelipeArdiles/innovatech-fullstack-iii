@@ -41,7 +41,7 @@ export default function ProjectDetailPage() {
 
   const capacidadEquipo = useMemo(() => {
     if (!proyecto?.trabajadores?.length) return []
-    return proyecto.trabajadores.map((t) => {
+    return (proyecto.trabajadores ?? []).map((t) => {
       const horasEnProyecto = (proyecto.tareas || [])
         .filter((ta) => ta.asignadoId === t.id)
         .reduce((sum, ta) => sum + (ta.horasEstimadas || 0), 0)
@@ -126,7 +126,7 @@ export default function ProjectDetailPage() {
           <h3>Equipo asignado</h3>
           <WorkerAvatars trabajadores={proyecto.trabajadores} max={8} />
           <ul className="detail-team-list">
-            {proyecto.trabajadores.map((t) => (
+            {(proyecto.trabajadores ?? []).map((t) => (
               <li key={t.id}>
                 <span>{t.nombre}</span>
                 <span className="detail-meta">{t.rol}</span>
