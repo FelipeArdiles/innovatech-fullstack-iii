@@ -4,6 +4,8 @@ Arquitectura de microservicios para la gestión integral de proyectos tecnológi
 
 **¿Primera vez con el proyecto?** Sigue la [guía de inicio paso a paso](docs/GUIA_INICIO.md) (Docker Compose o local, login Keycloak y URLs en el navegador).
 
+**Arquitectura y comunicación entre módulos:** [Diagrama de comunicación](docs/DIAGRAMA_COMUNICACION.md) (puertos, JWT, Eureka, Circuit Breaker, flujos login y datos).
+
 ## Arquitectura
 
 ```
