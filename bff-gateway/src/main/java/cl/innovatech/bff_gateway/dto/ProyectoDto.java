@@ -19,4 +19,7 @@ public class ProyectoDto {
 	private LocalDate fechaInicio;
 	private LocalDate fechaFin;
 	private BigDecimal presupuesto;
+	private BigDecimal costoReal;
+	private BigDecimal ingresosContrato;
+	private Double margenPorcentaje;
 }

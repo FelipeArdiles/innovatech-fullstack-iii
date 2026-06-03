@@ -2,7 +2,9 @@ package cl.innovatech.bff_gateway.controller;
 
 import cl.innovatech.bff_gateway.dto.CapacidadEquipoDto;
 import cl.innovatech.bff_gateway.dto.DashboardDto;
+import cl.innovatech.bff_gateway.dto.FinanzasResumenDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDetalleDto;
+import cl.innovatech.bff_gateway.dto.ProyectoFinanzasDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
 import cl.innovatech.bff_gateway.dto.TareaDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
@@ -95,6 +97,17 @@ public class BffController {
 	@GetMapping("/equipo/capacidad")
 	public CapacidadEquipoDto getCapacidadEquipo() {
 		return bffService.getCapacidadEquipo();
+	}
+
+	@GetMapping("/proyectos/{id}/finanzas")
+	public ResponseEntity<ProyectoFinanzasDto> getProyectoFinanzas(@PathVariable Long id) {
+		ProyectoFinanzasDto finanzas = bffService.getProyectoFinanzas(id);
+		return finanzas != null ? ResponseEntity.ok(finanzas) : ResponseEntity.notFound().build();
+	}
+
+	@GetMapping("/finanzas/resumen")
+	public FinanzasResumenDto getFinanzasResumen() {
+		return bffService.getFinanzasResumen();
 	}
 
 	@PostMapping("/proyectos")

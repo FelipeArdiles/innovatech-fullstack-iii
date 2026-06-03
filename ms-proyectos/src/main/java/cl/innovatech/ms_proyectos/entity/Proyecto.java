@@ -24,4 +24,6 @@ public class Proyecto {
 	private LocalDate fechaInicio;
 	private LocalDate fechaFin;
 	private BigDecimal presupuesto;
+	private BigDecimal costoReal;
+	private BigDecimal ingresosContrato;
 }

@@ -29,7 +29,7 @@ class ProyectoServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		proyecto = new Proyecto(1L, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L, null, null, null);
+		proyecto = new Proyecto(1L, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L, null, null, null, null, null);
 	}
 
 	@Test
@@ -44,7 +44,7 @@ class ProyectoServiceTest {
 		when(proyectoRepository.save(any(Proyecto.class))).thenReturn(proyecto);
 
 		Proyecto created = proyectoService.create(
-			new Proyecto(null, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L, null, null, null)
+			new Proyecto(null, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L, null, null, null, null, null)
 		);
 
 		assertThat(created.getEstado()).isEqualTo("EN_PROGRESO");

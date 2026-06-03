@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "tareas")
 @Data
@@ -20,4 +22,9 @@ public class Tarea {
 	private Long proyectoId;
 	private Long asignadoId;
 	private Integer horasEstimadas;
+	@Enumerated(EnumType.STRING)
+	private DificultadTarea dificultad;
+	private BigDecimal valorMonetario;
+	@Enumerated(EnumType.STRING)
+	private CategoriaTarea categoria;
 }

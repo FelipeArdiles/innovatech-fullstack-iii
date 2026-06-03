@@ -9,15 +9,11 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TareaDto {
+public class TareaValorDto {
 	private Long id;
 	private String titulo;
-	private String descripcion;
-	private String estado;
-	private Long proyectoId;
-	private Long asignadoId;
-	private Integer horasEstimadas;
-	private String dificultad;
-	private BigDecimal valorMonetario;
 	private String categoria;
+	private String dificultad;
+	private Integer horasEstimadas;
+	private BigDecimal valorMonetario;
 }

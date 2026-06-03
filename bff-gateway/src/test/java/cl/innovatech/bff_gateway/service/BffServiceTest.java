@@ -3,8 +3,10 @@ package cl.innovatech.bff_gateway.service;
 import cl.innovatech.bff_gateway.client.MicroserviceClient;
 import cl.innovatech.bff_gateway.dto.CapacidadEquipoDto;
 import cl.innovatech.bff_gateway.dto.DashboardDto;
+import cl.innovatech.bff_gateway.dto.FinanzasResumenDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDetalleDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
+import cl.innovatech.bff_gateway.dto.ProyectoFinanzasDto;
 import cl.innovatech.bff_gateway.dto.TareaDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
 import org.junit.jupiter.api.Test;
@@ -13,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -34,13 +37,16 @@ class BffServiceTest {
 			new UsuarioDto(1L, "Ana", "Dev", "ana@innovatech.cl", 40)
 		));
 		when(microserviceClient.getProyectos()).thenReturn(List.of(
-			new ProyectoDto(1L, "Portal", "EN_PROGRESO", "Desc", 1L, null, null, null)
+			proyectoDto(1L, "Portal", "EN_PROGRESO", "Desc", 1L, null, null,
+				new BigDecimal("100000"), new BigDecimal("80000"), new BigDecimal("120000"))
 		));
-		when(microserviceClient.getTareas()).thenReturn(List.of(
-			new TareaDto(1L, "UI", "Mockups", "POR_HACER", 1L, 1L, 8),
-			new TareaDto(2L, "API", "Keycloak", "EN_PROGRESO", 1L, 2L, 16),
-			new TareaDto(3L, "Deploy", "CI/CD", "HECHO", 2L, 3L, 4)
-		));
+		List<TareaDto> tareas = List.of(
+			tareaDto(1L, "UI", "POR_HACER", 1L, 1L, 8, "MEDIA", "5000", "DISENO"),
+			tareaDto(2L, "API", "EN_PROGRESO", 1L, 2L, 16, "ALTA", "10000", "DESARROLLO"),
+			tareaDto(3L, "Deploy", "HECHO", 2L, 3L, 4, "BAJA", "2000", "DEVOPS")
+		);
+		when(microserviceClient.getTareas()).thenReturn(tareas);
+		when(microserviceClient.getTareas(null)).thenReturn(tareas);
 
 		DashboardDto dashboard = bffService.getDashboard();
 
@@ -55,13 +61,14 @@ class BffServiceTest {
 	@Test
 	void getProyectoDetalleAggregatesTareasYTrabajadores() {
 		LocalDate fin = LocalDate.now().plusDays(30);
-		when(microserviceClient.getProyecto(1L)).thenReturn(
-			new ProyectoDto(1L, "Portal", "EN_PROGRESO", "Desc", 1L, LocalDate.now(), fin, null)
+		ProyectoDto proyecto = proyectoDto(1L, "Portal", "EN_PROGRESO", "Desc larga del portal", 1L, LocalDate.now(), fin,
+			new BigDecimal("50000"), new BigDecimal("30000"), new BigDecimal("80000"));
+		List<TareaDto> tareasProyecto = List.of(
+			tareaDto(1L, "UI", "POR_HACER", 1L, 1L, 10, "BAJA", "4000", "DISENO"),
+			tareaDto(2L, "API", "HECHO", 1L, 2L, 5, "ALTA", "6000", "DESARROLLO")
 		);
-		when(microserviceClient.getTareas(1L)).thenReturn(List.of(
-			new TareaDto(1L, "UI", "Mockups", "POR_HACER", 1L, 1L, 10),
-			new TareaDto(2L, "API", "Keycloak", "HECHO", 1L, 2L, 5)
-		));
+		when(microserviceClient.getProyecto(1L)).thenReturn(proyecto);
+		when(microserviceClient.getTareas(1L)).thenReturn(tareasProyecto);
 		when(microserviceClient.getUsuarios()).thenReturn(List.of(
 			new UsuarioDto(1L, "Ana", "Dev", "ana@innovatech.cl", 40),
 			new UsuarioDto(2L, "Carlos", "Arq", "carlos@innovatech.cl", 35)
@@ -84,7 +91,7 @@ class BffServiceTest {
 			new UsuarioDto(1L, "Ana", "Dev", "ana@innovatech.cl", 10)
 		));
 		when(microserviceClient.getTareas(null)).thenReturn(List.of(
-			new TareaDto(1L, "UI", "Mockups", "POR_HACER", 1L, 1L, 15)
+			tareaDto(1L, "UI", "POR_HACER", 1L, 1L, 15, "MEDIA", "3000", "DESARROLLO")
 		));
 
 		CapacidadEquipoDto capacidad = bffService.getCapacidadEquipo();
@@ -92,5 +99,57 @@ class BffServiceTest {
 		assertThat(capacidad.getTrabajadoresSobrecargados()).isEqualTo(1);
 		assertThat(capacidad.getTrabajadores().get(0).isSobrecargado()).isTrue();
 		assertThat(capacidad.getTrabajadores().get(0).getPorcentajeCarga()).isEqualTo(150.0);
+	}
+
+	@Test
+	void getProyectoFinanzasCalculaMargenYDesglose() {
+		when(microserviceClient.getProyecto(1L)).thenReturn(
+			proyectoDto(1L, "Portal", "EN_PROGRESO", "Desc", 1L, null, null,
+				new BigDecimal("100000"), new BigDecimal("50000"), new BigDecimal("100000"))
+		);
+		when(microserviceClient.getTareas(1L)).thenReturn(List.of(
+			tareaDto(1L, "UI", "POR_HACER", 1L, 1L, 8, "MEDIA", "15000", "DISENO"),
+			tareaDto(2L, "API", "HECHO", 1L, 2L, 16, "ALTA", "25000", "DESARROLLO")
+		));
+
+		ProyectoFinanzasDto finanzas = bffService.getProyectoFinanzas(1L);
+
+		assertThat(finanzas).isNotNull();
+		assertThat(finanzas.getCostoAcumulado()).isEqualByComparingTo(new BigDecimal("40000"));
+		assertThat(finanzas.getGanancia()).isEqualByComparingTo(new BigDecimal("60000"));
+		assertThat(finanzas.getMargenPorcentaje()).isEqualTo(60.0);
+		assertThat(finanzas.getDesglosePorCategoria()).hasSize(2);
+		assertThat(finanzas.isRentable()).isTrue();
+	}
+
+	@Test
+	void getFinanzasResumenAgregaKpisEmpresa() {
+		when(microserviceClient.getProyectos()).thenReturn(List.of(
+			proyectoDto(1L, "A", "EN_PROGRESO", "D", 1L, null, null,
+				null, null, new BigDecimal("100000")),
+			proyectoDto(2L, "B", "CANCELADO", "D", 2L, null, null,
+				null, null, new BigDecimal("50000"))
+		));
+		when(microserviceClient.getTareas(null)).thenReturn(List.of(
+			tareaDto(1L, "T1", "HECHO", 1L, 1L, 4, "BAJA", "30000", "DESARROLLO"),
+			tareaDto(2L, "T2", "HECHO", 2L, 2L, 4, "BAJA", "10000", "QA")
+		));
+
+		FinanzasResumenDto resumen = bffService.getFinanzasResumen();
+
+		assertThat(resumen.getIngresosTotales()).isEqualByComparingTo(new BigDecimal("100000"));
+		assertThat(resumen.getCostosTotales()).isEqualByComparingTo(new BigDecimal("30000"));
+		assertThat(resumen.getProyectosRentables()).isEqualTo(1);
+		assertThat(resumen.getProyectos()).hasSize(1);
+	}
+
+	private static ProyectoDto proyectoDto(Long id, String nombre, String estado, String desc, Long resp,
+			LocalDate inicio, LocalDate fin, BigDecimal presupuesto, BigDecimal costoReal, BigDecimal ingresos) {
+		return new ProyectoDto(id, nombre, estado, desc, resp, inicio, fin, presupuesto, costoReal, ingresos, null);
+	}
+
+	private static TareaDto tareaDto(Long id, String titulo, String estado, long pid, long aid, int horas,
+			String dificultad, String valor, String categoria) {
+		return new TareaDto(id, titulo, "Desc", estado, pid, aid, horas, dificultad, new BigDecimal(valor), categoria);
 	}
 }

@@ -20,11 +20,17 @@ public class ProyectoDetalleDto {
 	private LocalDate fechaInicio;
 	private LocalDate fechaFin;
 	private BigDecimal presupuesto;
+	private BigDecimal costoReal;
+	private BigDecimal ingresosContrato;
+	private Double margenPorcentaje;
 	private boolean atrasado;
 	private int tareasPorHacer;
 	private int tareasEnProgreso;
 	private int tareasHechas;
 	private int horasProyectoEstimadas;
+	private int tareasDificultadBaja;
+	private int tareasDificultadMedia;
+	private int tareasDificultadAlta;
 	private List<TareaDto> tareas;
 	private List<UsuarioDto> trabajadores;
 }

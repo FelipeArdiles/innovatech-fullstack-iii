@@ -4,14 +4,22 @@ import cl.innovatech.bff_gateway.client.MicroserviceClient;
 import cl.innovatech.bff_gateway.dto.CapacidadEquipoDto;
 import cl.innovatech.bff_gateway.dto.CapacidadTrabajadorDto;
 import cl.innovatech.bff_gateway.dto.DashboardDto;
+import cl.innovatech.bff_gateway.dto.FinanzasCategoriaDto;
+import cl.innovatech.bff_gateway.dto.FinanzasResumenDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDetalleDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
+import cl.innovatech.bff_gateway.dto.ProyectoFinanzasDto;
 import cl.innovatech.bff_gateway.dto.TareaDto;
+import cl.innovatech.bff_gateway.dto.TareaValorDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +38,7 @@ public class BffService {
 
 	public DashboardDto getDashboard() {
 		List<UsuarioDto> usuarios = microserviceClient.getUsuarios();
-		List<ProyectoDto> proyectos = microserviceClient.getProyectos();
+		List<ProyectoDto> proyectos = enrichProyectos(microserviceClient.getProyectos());
 		List<TareaDto> tareas = microserviceClient.getTareas();
 		long porHacer = tareas.stream().filter(t -> "POR_HACER".equals(t.getEstado())).count();
 		long enProgreso = tareas.stream().filter(t -> "EN_PROGRESO".equals(t.getEstado())).count();
@@ -69,15 +77,20 @@ public class BffService {
 	}
 
 	public List<ProyectoDto> getProyectos() {
-		return microserviceClient.getProyectos();
+		return enrichProyectos(microserviceClient.getProyectos());
 	}
 
 	public ProyectoDto getProyecto(Long id) {
-		return microserviceClient.getProyecto(id);
+		ProyectoDto proyecto = microserviceClient.getProyecto(id);
+		if (proyecto == null) {
+			return null;
+		}
+		List<TareaDto> tareas = microserviceClient.getTareas(id);
+		return enrichProyecto(proyecto, tareas);
 	}
 
 	public ProyectoDetalleDto getProyectoDetalle(Long id) {
-		ProyectoDto proyecto = microserviceClient.getProyecto(id);
+		ProyectoDto proyecto = getProyecto(id);
 		if (proyecto == null) {
 			return null;
 		}
@@ -123,13 +136,65 @@ public class BffService {
 			proyecto.getFechaInicio(),
 			proyecto.getFechaFin(),
 			proyecto.getPresupuesto(),
+			proyecto.getCostoReal(),
+			proyecto.getIngresosContrato(),
+			proyecto.getMargenPorcentaje(),
 			atrasado,
 			(int) porHacer,
 			(int) enProgreso,
 			(int) hechas,
 			horasProyecto,
+			countDificultad(tareas, "BAJA"),
+			countDificultad(tareas, "MEDIA"),
+			countDificultad(tareas, "ALTA"),
 			tareas,
 			trabajadores
+		);
+	}
+
+	public ProyectoFinanzasDto getProyectoFinanzas(Long id) {
+		ProyectoDto proyecto = microserviceClient.getProyecto(id);
+		if (proyecto == null) {
+			return null;
+		}
+		List<TareaDto> tareas = microserviceClient.getTareas(id);
+		return buildProyectoFinanzas(proyecto, tareas);
+	}
+
+	public FinanzasResumenDto getFinanzasResumen() {
+		List<ProyectoDto> proyectos = microserviceClient.getProyectos();
+		List<TareaDto> todasTareas = microserviceClient.getTareas(null);
+		Map<Long, List<TareaDto>> tareasPorProyecto = todasTareas.stream()
+			.filter(t -> t.getProyectoId() != null)
+			.collect(Collectors.groupingBy(TareaDto::getProyectoId));
+
+		List<ProyectoFinanzasDto> finanzasProyectos = proyectos.stream()
+			.filter(p -> !"CANCELADO".equals(p.getEstado()))
+			.map(p -> buildProyectoFinanzas(p, tareasPorProyecto.getOrDefault(p.getId(), List.of())))
+			.sorted(Comparator.comparing(ProyectoFinanzasDto::getNombreProyecto))
+			.toList();
+
+		BigDecimal ingresosTotales = finanzasProyectos.stream()
+			.map(ProyectoFinanzasDto::getIngresos)
+			.filter(Objects::nonNull)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal costosTotales = finanzasProyectos.stream()
+			.map(ProyectoFinanzasDto::getCostoAcumulado)
+			.filter(Objects::nonNull)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		BigDecimal gananciaNeta = ingresosTotales.subtract(costosTotales);
+		int rentables = (int) finanzasProyectos.stream().filter(ProyectoFinanzasDto::isRentable).count();
+
+		return new FinanzasResumenDto(
+			ingresosTotales,
+			costosTotales,
+			gananciaNeta,
+			calcularMargenPorcentaje(gananciaNeta, ingresosTotales),
+			proyectos.size(),
+			rentables,
+			finanzasProyectos
 		);
 	}
 
@@ -209,5 +274,95 @@ public class BffService {
 
 	public void deleteTarea(Long id) {
 		microserviceClient.deleteTarea(id);
+	}
+
+	private List<ProyectoDto> enrichProyectos(List<ProyectoDto> proyectos) {
+		List<TareaDto> todasTareas = microserviceClient.getTareas(null);
+		Map<Long, List<TareaDto>> porProyecto = todasTareas.stream()
+			.filter(t -> t.getProyectoId() != null)
+			.collect(Collectors.groupingBy(TareaDto::getProyectoId));
+		return proyectos.stream()
+			.map(p -> enrichProyecto(p, porProyecto.getOrDefault(p.getId(), List.of())))
+			.toList();
+	}
+
+	private ProyectoDto enrichProyecto(ProyectoDto proyecto, List<TareaDto> tareas) {
+		BigDecimal costoTareas = sumValorTareas(tareas);
+		BigDecimal ingresos = zeroIfNull(proyecto.getIngresosContrato());
+		BigDecimal ganancia = ingresos.subtract(costoTareas);
+		proyecto.setMargenPorcentaje(calcularMargenPorcentaje(ganancia, ingresos));
+		return proyecto;
+	}
+
+	private ProyectoFinanzasDto buildProyectoFinanzas(ProyectoDto proyecto, List<TareaDto> tareas) {
+		BigDecimal costoTareas = sumValorTareas(tareas);
+		BigDecimal costoReal = zeroIfNull(proyecto.getCostoReal());
+		BigDecimal costoAcumulado = costoTareas.max(costoReal);
+		BigDecimal ingresos = zeroIfNull(proyecto.getIngresosContrato());
+		BigDecimal ganancia = ingresos.subtract(costoAcumulado);
+		Double margen = calcularMargenPorcentaje(ganancia, ingresos);
+
+		Map<String, List<TareaDto>> porCategoria = tareas.stream()
+			.filter(t -> t.getCategoria() != null)
+			.collect(Collectors.groupingBy(TareaDto::getCategoria, LinkedHashMap::new, Collectors.toList()));
+
+		List<FinanzasCategoriaDto> desgloseCategoria = porCategoria.entrySet().stream()
+			.map(e -> new FinanzasCategoriaDto(
+				e.getKey(),
+				sumValorTareas(e.getValue()),
+				e.getValue().size()
+			))
+			.sorted(Comparator.comparing(FinanzasCategoriaDto::getValor).reversed())
+			.toList();
+
+		List<TareaValorDto> desgloseTareas = tareas.stream()
+			.sorted(Comparator.comparing(TareaDto::getValorMonetario, Comparator.nullsLast(Comparator.reverseOrder())))
+			.map(t -> new TareaValorDto(
+				t.getId(),
+				t.getTitulo(),
+				t.getCategoria(),
+				t.getDificultad(),
+				t.getHorasEstimadas(),
+				t.getValorMonetario()
+			))
+			.toList();
+
+		return new ProyectoFinanzasDto(
+			proyecto.getId(),
+			proyecto.getNombre(),
+			proyecto.getPresupuesto(),
+			costoAcumulado,
+			costoReal,
+			ingresos,
+			ganancia,
+			margen,
+			ganancia.compareTo(BigDecimal.ZERO) > 0,
+			desgloseCategoria,
+			desgloseTareas
+		);
+	}
+
+	private static BigDecimal sumValorTareas(List<TareaDto> tareas) {
+		return tareas.stream()
+			.map(TareaDto::getValorMonetario)
+			.filter(Objects::nonNull)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+
+	private static BigDecimal zeroIfNull(BigDecimal value) {
+		return value != null ? value : BigDecimal.ZERO;
+	}
+
+	private static Double calcularMargenPorcentaje(BigDecimal ganancia, BigDecimal ingresos) {
+		if (ingresos == null || ingresos.compareTo(BigDecimal.ZERO) <= 0) {
+			return null;
+		}
+		return ganancia.multiply(BigDecimal.valueOf(100))
+			.divide(ingresos, 1, RoundingMode.HALF_UP)
+			.doubleValue();
+	}
+
+	private static int countDificultad(List<TareaDto> tareas, String dificultad) {
+		return (int) tareas.stream().filter(t -> dificultad.equals(t.getDificultad())).count();
 	}
 }
