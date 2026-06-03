@@ -41,6 +41,15 @@ export const api = {
   deleteUsuario: (id) =>
     authFetch(`/api/usuarios/${id}`, { method: 'DELETE' }),
 
+  getTrabajadores: () => authFetch('/api/trabajadores'),
+  getTrabajador: (id) => authFetch(`/api/trabajadores/${id}`),
+  createTrabajador: (data) =>
+    authFetch('/api/trabajadores', { method: 'POST', body: JSON.stringify(data) }),
+  updateTrabajador: (id, data) =>
+    authFetch(`/api/trabajadores/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteTrabajador: (id) =>
+    authFetch(`/api/trabajadores/${id}`, { method: 'DELETE' }),
+
   getProyectos: () => authFetch('/api/proyectos'),
   getProyecto: (id) => authFetch(`/api/proyectos/${id}`),
   createProyecto: (data) =>
@@ -49,4 +58,16 @@ export const api = {
     authFetch(`/api/proyectos/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteProyecto: (id) =>
     authFetch(`/api/proyectos/${id}`, { method: 'DELETE' }),
+
+  getTareas: (proyectoId) => {
+    const query = proyectoId ? `?proyectoId=${proyectoId}` : ''
+    return authFetch(`/api/tareas${query}`)
+  },
+  getTarea: (id) => authFetch(`/api/tareas/${id}`),
+  createTarea: (data) =>
+    authFetch('/api/tareas', { method: 'POST', body: JSON.stringify(data) }),
+  updateTarea: (id, data) =>
+    authFetch(`/api/tareas/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteTarea: (id) =>
+    authFetch(`/api/tareas/${id}`, { method: 'DELETE' }),
 }
