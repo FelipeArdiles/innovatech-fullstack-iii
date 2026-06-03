@@ -13,4 +13,5 @@ public class UsuarioDto {
 	private String rol;
 	private String email;
 	private Integer capacidadHoras;
+	private Long sueldoMensualClp;
 }

@@ -30,6 +30,9 @@ import java.util.stream.Collectors;
 @Service
 public class BffService {
 
+	private static final int HORAS_MES_LABORALES = 160;
+	private static final BigDecimal PCT_OTROS_GASTOS = new BigDecimal("0.08");
+
 	private final MicroserviceClient microserviceClient;
 
 	public BffService(MicroserviceClient microserviceClient) {
@@ -86,7 +89,7 @@ public class BffService {
 			return null;
 		}
 		List<TareaDto> tareas = microserviceClient.getTareas(id);
-		return enrichProyecto(proyecto, tareas);
+		return enrichProyecto(proyecto, tareas, usuariosIndexados());
 	}
 
 	public ProyectoDetalleDto getProyectoDetalle(Long id) {
@@ -158,19 +161,21 @@ public class BffService {
 			return null;
 		}
 		List<TareaDto> tareas = microserviceClient.getTareas(id);
-		return buildProyectoFinanzas(proyecto, tareas);
+		Map<Long, UsuarioDto> usuariosPorId = usuariosIndexados();
+		return buildProyectoFinanzas(proyecto, tareas, usuariosPorId);
 	}
 
 	public FinanzasResumenDto getFinanzasResumen() {
 		List<ProyectoDto> proyectos = microserviceClient.getProyectos();
 		List<TareaDto> todasTareas = microserviceClient.getTareas(null);
+		Map<Long, UsuarioDto> usuariosPorId = usuariosIndexados();
 		Map<Long, List<TareaDto>> tareasPorProyecto = todasTareas.stream()
 			.filter(t -> t.getProyectoId() != null)
 			.collect(Collectors.groupingBy(TareaDto::getProyectoId));
 
 		List<ProyectoFinanzasDto> finanzasProyectos = proyectos.stream()
 			.filter(p -> !"CANCELADO".equals(p.getEstado()))
-			.map(p -> buildProyectoFinanzas(p, tareasPorProyecto.getOrDefault(p.getId(), List.of())))
+			.map(p -> buildProyectoFinanzas(p, tareasPorProyecto.getOrDefault(p.getId(), List.of()), usuariosPorId))
 			.sorted(Comparator.comparing(ProyectoFinanzasDto::getNombreProyecto))
 			.toList();
 
@@ -214,6 +219,9 @@ public class BffService {
 		int horasDisponiblesTotal = 0;
 		int horasAsignadasTotal = 0;
 
+		BigDecimal costoNominaMensual = BigDecimal.ZERO;
+		BigDecimal costoHorasAsignadasTotal = BigDecimal.ZERO;
+
 		for (UsuarioDto usuario : usuarios) {
 			int disponibles = usuario.getCapacidadHoras() != null ? usuario.getCapacidadHoras() : 0;
 			int asignadas = horasPorTrabajador.getOrDefault(usuario.getId(), 0);
@@ -224,6 +232,12 @@ public class BffService {
 			}
 			horasDisponiblesTotal += disponibles;
 			horasAsignadasTotal += asignadas;
+			Long sueldo = usuario.getSueldoMensualClp();
+			if (sueldo != null) {
+				costoNominaMensual = costoNominaMensual.add(BigDecimal.valueOf(sueldo));
+			}
+			BigDecimal costoHoras = costoHorasProrrateadas(asignadas, sueldo);
+			costoHorasAsignadasTotal = costoHorasAsignadasTotal.add(costoHoras);
 			capacidades.add(new CapacidadTrabajadorDto(
 				usuario.getId(),
 				usuario.getNombre(),
@@ -231,7 +245,9 @@ public class BffService {
 				disponibles,
 				asignadas,
 				Math.round(porcentaje * 10.0) / 10.0,
-				sobrecargado
+				sobrecargado,
+				sueldo,
+				costoHoras
 			));
 		}
 
@@ -240,6 +256,8 @@ public class BffService {
 			sobrecargados,
 			horasDisponiblesTotal,
 			horasAsignadasTotal,
+			costoNominaMensual,
+			costoHorasAsignadasTotal,
 			capacidades
 		);
 	}
@@ -278,26 +296,36 @@ public class BffService {
 
 	private List<ProyectoDto> enrichProyectos(List<ProyectoDto> proyectos) {
 		List<TareaDto> todasTareas = microserviceClient.getTareas(null);
+		Map<Long, UsuarioDto> usuariosPorId = usuariosIndexados();
 		Map<Long, List<TareaDto>> porProyecto = todasTareas.stream()
 			.filter(t -> t.getProyectoId() != null)
 			.collect(Collectors.groupingBy(TareaDto::getProyectoId));
 		return proyectos.stream()
-			.map(p -> enrichProyecto(p, porProyecto.getOrDefault(p.getId(), List.of())))
+			.map(p -> enrichProyecto(p, porProyecto.getOrDefault(p.getId(), List.of()), usuariosPorId))
 			.toList();
 	}
 
-	private ProyectoDto enrichProyecto(ProyectoDto proyecto, List<TareaDto> tareas) {
-		BigDecimal costoTareas = sumValorTareas(tareas);
+	private ProyectoDto enrichProyecto(ProyectoDto proyecto, List<TareaDto> tareas, Map<Long, UsuarioDto> usuariosPorId) {
+		BigDecimal costoAcumulado = calcularCostoAcumulado(proyecto, tareas, usuariosPorId);
 		BigDecimal ingresos = zeroIfNull(proyecto.getIngresosContrato());
-		BigDecimal ganancia = ingresos.subtract(costoTareas);
+		BigDecimal ganancia = ingresos.subtract(costoAcumulado);
 		proyecto.setMargenPorcentaje(calcularMargenPorcentaje(ganancia, ingresos));
 		return proyecto;
 	}
 
-	private ProyectoFinanzasDto buildProyectoFinanzas(ProyectoDto proyecto, List<TareaDto> tareas) {
+	private Map<Long, UsuarioDto> usuariosIndexados() {
+		return microserviceClient.getUsuarios().stream()
+			.collect(Collectors.toMap(UsuarioDto::getId, u -> u, (a, b) -> a));
+	}
+
+	private ProyectoFinanzasDto buildProyectoFinanzas(ProyectoDto proyecto, List<TareaDto> tareas,
+			Map<Long, UsuarioDto> usuariosPorId) {
 		BigDecimal costoTareas = sumValorTareas(tareas);
+		BigDecimal costoSueldos = calcularCostoSueldosProyecto(tareas, usuariosPorId);
+		BigDecimal otrosGastos = calcularOtrosGastos(proyecto.getPresupuesto());
 		BigDecimal costoReal = zeroIfNull(proyecto.getCostoReal());
-		BigDecimal costoAcumulado = costoTareas.max(costoReal);
+		BigDecimal costoCalculado = costoSueldos.add(costoTareas).add(otrosGastos);
+		BigDecimal costoAcumulado = costoCalculado.max(costoReal);
 		BigDecimal ingresos = zeroIfNull(proyecto.getIngresosContrato());
 		BigDecimal ganancia = ingresos.subtract(costoAcumulado);
 		Double margen = calcularMargenPorcentaje(ganancia, ingresos);
@@ -331,6 +359,9 @@ public class BffService {
 			proyecto.getId(),
 			proyecto.getNombre(),
 			proyecto.getPresupuesto(),
+			costoSueldos,
+			costoTareas,
+			otrosGastos,
 			costoAcumulado,
 			costoReal,
 			ingresos,
@@ -340,6 +371,47 @@ public class BffService {
 			desgloseCategoria,
 			desgloseTareas
 		);
+	}
+
+	private BigDecimal calcularCostoAcumulado(ProyectoDto proyecto, List<TareaDto> tareas,
+			Map<Long, UsuarioDto> usuariosPorId) {
+		BigDecimal costoSueldos = calcularCostoSueldosProyecto(tareas, usuariosPorId);
+		BigDecimal costoTareas = sumValorTareas(tareas);
+		BigDecimal otrosGastos = calcularOtrosGastos(proyecto.getPresupuesto());
+		BigDecimal costoCalculado = costoSueldos.add(costoTareas).add(otrosGastos);
+		return costoCalculado.max(zeroIfNull(proyecto.getCostoReal()));
+	}
+
+	private static BigDecimal calcularCostoSueldosProyecto(List<TareaDto> tareas, Map<Long, UsuarioDto> usuariosPorId) {
+		Map<Long, Integer> horasPorTrabajador = tareas.stream()
+			.filter(t -> t.getAsignadoId() != null && t.getHorasEstimadas() != null)
+			.collect(Collectors.groupingBy(
+				TareaDto::getAsignadoId,
+				Collectors.summingInt(TareaDto::getHorasEstimadas)
+			));
+		BigDecimal total = BigDecimal.ZERO;
+		for (Map.Entry<Long, Integer> entry : horasPorTrabajador.entrySet()) {
+			UsuarioDto usuario = usuariosPorId.get(entry.getKey());
+			Long sueldo = usuario != null ? usuario.getSueldoMensualClp() : null;
+			total = total.add(costoHorasProrrateadas(entry.getValue(), sueldo));
+		}
+		return total;
+	}
+
+	private static BigDecimal costoHorasProrrateadas(int horas, Long sueldoMensualClp) {
+		if (horas <= 0 || sueldoMensualClp == null || sueldoMensualClp <= 0) {
+			return BigDecimal.ZERO;
+		}
+		return BigDecimal.valueOf(sueldoMensualClp)
+			.multiply(BigDecimal.valueOf(horas))
+			.divide(BigDecimal.valueOf(HORAS_MES_LABORALES), 0, RoundingMode.HALF_UP);
+	}
+
+	private static BigDecimal calcularOtrosGastos(BigDecimal presupuesto) {
+		if (presupuesto == null || presupuesto.compareTo(BigDecimal.ZERO) <= 0) {
+			return BigDecimal.ZERO;
+		}
+		return presupuesto.multiply(PCT_OTROS_GASTOS).setScale(0, RoundingMode.HALF_UP);
 	}
 
 	private static BigDecimal sumValorTareas(List<TareaDto> tareas) {
