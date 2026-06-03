@@ -124,7 +124,7 @@ class BffServiceTest {
 		assertThat(finanzas).isNotNull();
 		assertThat(finanzas.getCostoTareasOperacional()).isEqualByComparingTo(new BigDecimal("501000"));
 		assertThat(finanzas.getCostoSueldos()).isEqualByComparingTo(new BigDecimal("380000"));
-		assertThat(finanzas.getOtrosGastos()).isEqualByComparingTo(new BigDecimal("5760000"));
+		assertThat(finanzas.getOtrosGastos()).isEqualByComparingTo(new BigDecimal("8640000"));
 		assertThat(finanzas.getCostoAcumulado()).isEqualByComparingTo(new BigDecimal("68000000"));
 		assertThat(finanzas.getGanancia()).isEqualByComparingTo(new BigDecimal("24000000"));
 		assertThat(finanzas.getMargenPorcentaje()).isEqualTo(26.1);

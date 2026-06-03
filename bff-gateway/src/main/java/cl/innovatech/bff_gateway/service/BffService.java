@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class BffService {
 
 	private static final int HORAS_MES_LABORALES = 160;
-	private static final BigDecimal PCT_OTROS_GASTOS = new BigDecimal("0.08");
+	private static final BigDecimal PCT_OTROS_GASTOS = new BigDecimal("0.12");
 
 	private final MicroserviceClient microserviceClient;
 
