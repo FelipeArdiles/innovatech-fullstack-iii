@@ -6,7 +6,8 @@ import Button from './ui/Button'
 import AnimatedOutlet from './AnimatedOutlet'
 
 const navItems = [
-  { to: '/', label: 'Dashboard', icon: 'dashboard', end: true },
+  { to: '/', label: 'Inicio', icon: 'home', end: true },
+  { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { to: '/trabajadores', label: 'Trabajadores', icon: 'workers' },
   { to: '/proyectos', label: 'Proyectos', icon: 'projects' },
   { to: '/tareas', label: 'Tablero Trello', icon: 'tasks' },

@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { initAuth } from './auth/keycloak'
 import Layout from './components/Layout'
+import InicioPage from './pages/InicioPage'
 import Dashboard from './pages/Dashboard'
 import TrabajadoresPage from './pages/TrabajadoresPage'
 import ProyectosPage from './pages/ProyectosPage'
@@ -41,7 +42,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<InicioPage />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="trabajadores" element={<TrabajadoresPage />} />
           <Route path="usuarios" element={<Navigate to="/trabajadores" replace />} />
           <Route path="proyectos" element={<ProyectosPage />} />

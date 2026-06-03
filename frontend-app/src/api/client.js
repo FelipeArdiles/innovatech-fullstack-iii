@@ -41,14 +41,14 @@ export const api = {
   deleteUsuario: (id) =>
     authFetch(`/api/usuarios/${id}`, { method: 'DELETE' }),
 
-  getTrabajadores: () => authFetch('/api/trabajadores'),
-  getTrabajador: (id) => authFetch(`/api/trabajadores/${id}`),
+  getTrabajadores: () => authFetch('/api/usuarios'),
+  getTrabajador: (id) => authFetch(`/api/usuarios/${id}`),
   createTrabajador: (data) =>
-    authFetch('/api/trabajadores', { method: 'POST', body: JSON.stringify(data) }),
+    authFetch('/api/usuarios', { method: 'POST', body: JSON.stringify(data) }),
   updateTrabajador: (id, data) =>
-    authFetch(`/api/trabajadores/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+    authFetch(`/api/usuarios/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteTrabajador: (id) =>
-    authFetch(`/api/trabajadores/${id}`, { method: 'DELETE' }),
+    authFetch(`/api/usuarios/${id}`, { method: 'DELETE' }),
 
   getProyectos: () => authFetch('/api/proyectos'),
   getProyecto: (id) => authFetch(`/api/proyectos/${id}`),
