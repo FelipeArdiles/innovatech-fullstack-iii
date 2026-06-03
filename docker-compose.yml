@@ -71,6 +71,20 @@ services:
     networks:
       - innovatech-net
 
+  ms-tareas:
+    build:
+      context: ./ms-tareas
+      dockerfile: Dockerfile
+    container_name: innovatech-ms-tareas
+    environment:
+      SERVER_PORT: 8084
+      EUREKA_URL: http://eureka-server:8761/eureka/
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - innovatech-net
+
   bff-gateway:
     build:
       context: ./bff-gateway
@@ -85,6 +99,8 @@ services:
       ms-usuarios:
         condition: service_started
       ms-proyectos:
+        condition: service_started
+      ms-tareas:
         condition: service_started
     networks:
       - innovatech-net

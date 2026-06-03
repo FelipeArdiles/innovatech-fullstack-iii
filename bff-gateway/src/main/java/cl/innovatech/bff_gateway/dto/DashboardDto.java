@@ -12,6 +12,11 @@ import java.util.List;
 public class DashboardDto {
 	private int totalUsuarios;
 	private int totalProyectos;
+	private int totalTareas;
+	private int tareasPorHacer;
+	private int tareasEnProgreso;
+	private int tareasHechas;
 	private List<UsuarioDto> usuarios;
 	private List<ProyectoDto> proyectos;
+	private List<TareaDto> tareas;
 }

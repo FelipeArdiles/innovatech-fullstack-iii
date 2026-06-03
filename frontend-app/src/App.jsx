@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import { initAuth } from './auth/keycloak'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
-import UsuariosPage from './pages/UsuariosPage'
+import TrabajadoresPage from './pages/TrabajadoresPage'
 import ProyectosPage from './pages/ProyectosPage'
+import TareasPage from './pages/TareasPage'
+import { Spinner } from './components/ui/LoadingSkeleton'
 import './App.css'
 
 function App() {
@@ -20,8 +22,8 @@ function App() {
   if (error) {
     return (
       <div className="app app--centered">
-        <h1>Innovatech Solutions</h1>
-        <p className="error">Error: {error}</p>
+        <div className="app__brand">Innovatech Solutions</div>
+        <p className="error">{error}</p>
       </div>
     )
   }
@@ -29,8 +31,8 @@ function App() {
   if (!ready) {
     return (
       <div className="app app--centered">
-        <h1>Innovatech Solutions</h1>
-        <p className="state-message">Cargando plataforma…</p>
+        <div className="app__brand">Innovatech Solutions</div>
+        <Spinner label="Iniciando plataforma…" />
       </div>
     )
   }
@@ -40,8 +42,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
-          <Route path="usuarios" element={<UsuariosPage />} />
+          <Route path="trabajadores" element={<TrabajadoresPage />} />
+          <Route path="usuarios" element={<Navigate to="/trabajadores" replace />} />
           <Route path="proyectos" element={<ProyectosPage />} />
+          <Route path="tareas" element={<TareasPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

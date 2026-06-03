@@ -2,6 +2,7 @@ package cl.innovatech.bff_gateway.controller;
 
 import cl.innovatech.bff_gateway.dto.DashboardDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
+import cl.innovatech.bff_gateway.dto.TareaDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
 import cl.innovatech.bff_gateway.service.BffService;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,31 @@ public class BffController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@GetMapping("/trabajadores")
+	public List<UsuarioDto> listTrabajadores() {
+		return bffService.getUsuarios();
+	}
+
+	@GetMapping("/trabajadores/{id}")
+	public ResponseEntity<UsuarioDto> getTrabajador(@PathVariable Long id) {
+		return getUsuario(id);
+	}
+
+	@PostMapping("/trabajadores")
+	public ResponseEntity<UsuarioDto> createTrabajador(@RequestBody UsuarioDto trabajador) {
+		return createUsuario(trabajador);
+	}
+
+	@PutMapping("/trabajadores/{id}")
+	public ResponseEntity<UsuarioDto> updateTrabajador(@PathVariable Long id, @RequestBody UsuarioDto trabajador) {
+		return updateUsuario(id, trabajador);
+	}
+
+	@DeleteMapping("/trabajadores/{id}")
+	public ResponseEntity<Void> deleteTrabajador(@PathVariable Long id) {
+		return deleteUsuario(id);
+	}
+
 	@GetMapping("/proyectos")
 	public List<ProyectoDto> listProyectos() {
 		return bffService.getProyectos();
@@ -78,6 +104,34 @@ public class BffController {
 	@DeleteMapping("/proyectos/{id}")
 	public ResponseEntity<Void> deleteProyecto(@PathVariable Long id) {
 		bffService.deleteProyecto(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/tareas")
+	public List<TareaDto> listTareas(@RequestParam(required = false) Long proyectoId) {
+		return bffService.getTareas(proyectoId);
+	}
+
+	@GetMapping("/tareas/{id}")
+	public ResponseEntity<TareaDto> getTarea(@PathVariable Long id) {
+		TareaDto tarea = bffService.getTarea(id);
+		return tarea != null ? ResponseEntity.ok(tarea) : ResponseEntity.notFound().build();
+	}
+
+	@PostMapping("/tareas")
+	public ResponseEntity<TareaDto> createTarea(@RequestBody TareaDto tarea) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(bffService.createTarea(tarea));
+	}
+
+	@PutMapping("/tareas/{id}")
+	public ResponseEntity<TareaDto> updateTarea(@PathVariable Long id, @RequestBody TareaDto tarea) {
+		TareaDto updated = bffService.updateTarea(id, tarea);
+		return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+	}
+
+	@DeleteMapping("/tareas/{id}")
+	public ResponseEntity<Void> deleteTarea(@PathVariable Long id) {
+		bffService.deleteTarea(id);
 		return ResponseEntity.noContent().build();
 	}
 }
