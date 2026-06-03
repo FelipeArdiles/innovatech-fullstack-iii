@@ -29,7 +29,7 @@ class ProyectoServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		proyecto = new Proyecto(1L, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L);
+		proyecto = new Proyecto(1L, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L, null, null, null);
 	}
 
 	@Test

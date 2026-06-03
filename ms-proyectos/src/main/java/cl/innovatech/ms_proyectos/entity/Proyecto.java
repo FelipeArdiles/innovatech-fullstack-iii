@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "proyectos")
 @Data
@@ -18,4 +21,7 @@ public class Proyecto {
 	private String estado;
 	private String descripcion;
 	private Long responsableId;
+	private LocalDate fechaInicio;
+	private LocalDate fechaFin;
+	private BigDecimal presupuesto;
 }

@@ -14,4 +14,5 @@ public class TareaDto {
 	private String estado;
 	private Long proyectoId;
 	private Long asignadoId;
+	private Integer horasEstimadas;
 }
