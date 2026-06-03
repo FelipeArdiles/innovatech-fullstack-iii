@@ -29,7 +29,7 @@ class TareaServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		tarea = new Tarea(1L, "Diseñar UI", "Mockups", "POR_HACER", 1L, 1L);
+		tarea = new Tarea(1L, "Diseñar UI", "Mockups", "POR_HACER", 1L, 1L, 8);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ class TareaServiceTest {
 	void createPersistsNewTarea() {
 		when(tareaRepository.save(any(Tarea.class))).thenReturn(tarea);
 
-		Tarea created = tareaService.create(new Tarea(null, "Diseñar UI", "Mockups", "POR_HACER", 1L, 1L));
+		Tarea created = tareaService.create(new Tarea(null, "Diseñar UI", "Mockups", "POR_HACER", 1L, 1L, 8));
 
 		assertThat(created.getEstado()).isEqualTo("POR_HACER");
 	}

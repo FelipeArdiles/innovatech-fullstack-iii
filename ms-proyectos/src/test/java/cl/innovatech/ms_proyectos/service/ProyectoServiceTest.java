@@ -43,7 +43,9 @@ class ProyectoServiceTest {
 	void createPersistsNewProyecto() {
 		when(proyectoRepository.save(any(Proyecto.class))).thenReturn(proyecto);
 
-		Proyecto created = proyectoService.create(new Proyecto(null, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L));
+		Proyecto created = proyectoService.create(
+			new Proyecto(null, "Portal Clientes", "EN_PROGRESO", "Modernización", 1L, null, null, null)
+		);
 
 		assertThat(created.getEstado()).isEqualTo("EN_PROGRESO");
 	}

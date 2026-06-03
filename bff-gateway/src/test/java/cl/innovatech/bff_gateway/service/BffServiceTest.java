@@ -83,7 +83,7 @@ class BffServiceTest {
 		when(microserviceClient.getUsuarios()).thenReturn(List.of(
 			new UsuarioDto(1L, "Ana", "Dev", "ana@innovatech.cl", 10)
 		));
-		when(microserviceClient.getTareas()).thenReturn(List.of(
+		when(microserviceClient.getTareas(null)).thenReturn(List.of(
 			new TareaDto(1L, "UI", "Mockups", "POR_HACER", 1L, 1L, 15)
 		));
 
