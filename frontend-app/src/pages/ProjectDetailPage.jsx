@@ -11,7 +11,7 @@ import ProgressRing from '../components/charts/ProgressRing'
 import CapacityChart from '../components/charts/CapacityChart'
 import DifficultyChart from '../components/charts/DifficultyChart'
 import { timelinePercent } from '../utils/projectDates'
-import { formatMargen, formatMoney, margenBadgeClass } from '../utils/money'
+import { formatCLP, formatMargen, margenBadgeClass, OTROS_GASTOS_TOOLTIP } from '../utils/money'
 
 const ProjectFinancialCharts = lazy(() => import('../components/charts/ProjectFinancialCharts'))
 
@@ -135,7 +135,7 @@ export default function ProjectDetailPage() {
           </span>
         )}
         {proyecto.presupuesto != null && (
-          <span className="badge badge--neutral">Presupuesto {formatMoney(proyecto.presupuesto)}</span>
+          <span className="badge badge--neutral">Presupuesto {formatCLP(proyecto.presupuesto)}</span>
         )}
       </div>
 
@@ -175,7 +175,7 @@ export default function ProjectDetailPage() {
               </article>
               <article className="summary-card">
                 <span className="summary-card__label">Ingresos</span>
-                <strong className="summary-card__value">{formatMoney(proyecto.ingresosContrato)}</strong>
+                <strong className="summary-card__value">{formatCLP(proyecto.ingresosContrato)}</strong>
               </article>
             </div>
           </section>
@@ -241,7 +241,7 @@ export default function ProjectDetailPage() {
                 {t.dificultad && <span className="badge badge--neutral">{t.dificultad}</span>}
                 {t.categoria && <span className="badge badge--neutral">{t.categoria}</span>}
                 {t.horasEstimadas != null && <span className="detail-meta">{t.horasEstimadas} h</span>}
-                {t.valorMonetario != null && <span className="detail-meta">{formatMoney(t.valorMonetario)}</span>}
+                {t.valorMonetario != null && <span className="detail-meta">{formatCLP(t.valorMonetario)}</span>}
               </li>
             ))}
           </ul>
@@ -284,23 +284,50 @@ export default function ProjectDetailPage() {
             <>
               <div className="summary-cards detail-card--wide" style={{ gridColumn: '1 / -1' }}>
                 <article className="summary-card">
-                  <span className="summary-card__label">Presupuesto</span>
-                  <strong className="summary-card__value">{formatMoney(finanzas.presupuesto)}</strong>
+                  <span className="summary-card__label">Presupuesto (CLP)</span>
+                  <strong className="summary-card__value">{formatCLP(finanzas.presupuesto)}</strong>
                 </article>
                 <article className="summary-card">
                   <span className="summary-card__label">Costo acumulado</span>
-                  <strong className="summary-card__value">{formatMoney(finanzas.costoAcumulado)}</strong>
+                  <strong className="summary-card__value">{formatCLP(finanzas.costoAcumulado)}</strong>
                 </article>
                 <article className="summary-card">
                   <span className="summary-card__label">Ingresos contrato</span>
-                  <strong className="summary-card__value">{formatMoney(finanzas.ingresos)}</strong>
+                  <strong className="summary-card__value">{formatCLP(finanzas.ingresos)}</strong>
                 </article>
                 <article className={`summary-card${finanzas.rentable ? '' : ' summary-card--danger'}`}>
                   <span className="summary-card__label">Ganancia / margen</span>
-                  <strong className="summary-card__value">{formatMoney(finanzas.ganancia)}</strong>
+                  <strong className="summary-card__value">{formatCLP(finanzas.ganancia)}</strong>
                   <span className="summary-card__hint">{formatMargen(finanzas.margenPorcentaje)}</span>
                 </article>
               </div>
+              <section className="detail-card detail-card--wide">
+                <h3>Desglose de costos</h3>
+                <div className="summary-cards summary-cards--compact">
+                  <article className="summary-card">
+                    <span className="summary-card__label">Sueldos del equipo</span>
+                    <strong className="summary-card__value">{formatCLP(finanzas.costoSueldos)}</strong>
+                    <span className="summary-card__hint">Prorrateo por horas asignadas</span>
+                  </article>
+                  <article className="summary-card">
+                    <span className="summary-card__label">Costo tareas</span>
+                    <strong className="summary-card__value">{formatCLP(finanzas.costoTareasOperacional)}</strong>
+                    <span className="summary-card__hint">Valor operacional estimado</span>
+                  </article>
+                  <article className="summary-card">
+                    <span
+                      className="summary-card__label fin-label-tip"
+                      title={OTROS_GASTOS_TOOLTIP}
+                    >
+                      Otros gastos ⓘ
+                    </span>
+                    <strong className="summary-card__value">{formatCLP(finanzas.otrosGastos)}</strong>
+                    <span className="summary-card__hint" title={OTROS_GASTOS_TOOLTIP}>
+                      Licencias / infra ~12% presupuesto
+                    </span>
+                  </article>
+                </div>
+              </section>
               <section className="detail-card detail-card--wide">
                 <h3>Análisis financiero</h3>
                 <Suspense fallback={<LoadingSkeleton variant="card" rows={1} />}>
@@ -317,7 +344,7 @@ export default function ProjectDetailPage() {
                         <span className="detail-meta">{t.categoria} · {t.dificultad}</span>
                       </div>
                       <span className="detail-meta">{t.horasEstimadas} h</span>
-                      <span className="badge badge--info">{formatMoney(t.valorMonetario)}</span>
+                      <span className="badge badge--info">{formatCLP(t.valorMonetario)}</span>
                     </li>
                   ))}
                 </ul>

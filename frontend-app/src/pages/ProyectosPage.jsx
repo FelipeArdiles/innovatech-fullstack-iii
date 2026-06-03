@@ -7,7 +7,7 @@ import PageHeader from '../components/ui/PageHeader'
 import Button from '../components/ui/Button'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
 import { daysUntil, formatDate, isProyectoAtrasado } from '../utils/projectDates'
-import { formatMargen, margenBadgeClass } from '../utils/money'
+import { formatCLP, formatMargen, margenBadgeClass } from '../utils/money'
 
 const ESTADOS = ['PLANIFICADO', 'EN_PROGRESO', 'COMPLETADO', 'CANCELADO']
 
@@ -244,6 +244,12 @@ export default function ProyectosPage() {
                 <p className="proyecto-card__desc">{p.descripcion}</p>
                 <div className="proyecto-card__meta">
                   <span>Responsable: {trabajadorLabel(p.responsableId)}</span>
+                  {p.ingresosContrato != null && (
+                    <span>Ingresos: {formatCLP(p.ingresosContrato)}</span>
+                  )}
+                  {p.presupuesto != null && (
+                    <span>Presupuesto: {formatCLP(p.presupuesto)}</span>
+                  )}
                   {(p.fechaInicio || p.fechaFin) && (
                     <span>{formatDate(p.fechaInicio)} – {formatDate(p.fechaFin)}</span>
                   )}

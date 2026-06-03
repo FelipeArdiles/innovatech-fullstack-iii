@@ -5,6 +5,7 @@ import FlashMessage from '../components/FlashMessage'
 import Card from '../components/ui/Card'
 import PageHeader from '../components/ui/PageHeader'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
+import { formatCLP, formatMargen, margenBadgeClass } from '../utils/money'
 
 const KPI_CONFIG = [
   { key: 'totalUsuarios', label: 'Trabajadores', gradient: 1, link: '/trabajadores' },
@@ -17,15 +18,18 @@ const KPI_CONFIG = [
 
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState(null)
+  const [finanzas, setFinanzas] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
   useEffect(() => {
     setLoading(true)
     setError('')
-    api
-      .getDashboard()
-      .then(setDashboard)
+    Promise.all([api.getDashboard(), api.getFinanzasResumen()])
+      .then(([dash, fin]) => {
+        setDashboard(dash)
+        setFinanzas(fin)
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
@@ -47,9 +51,10 @@ export default function Dashboard() {
     <div className="page">
       <PageHeader
         title="Dashboard KPIs"
-        subtitle="Vista general de trabajadores, proyectos y tablero Kanban"
+        subtitle="Vista general de trabajadores, proyectos, tablero Kanban y finanzas CLP"
         actions={
           <>
+            <Link to="/finanzas" className="btn btn--secondary">Finanzas empresa</Link>
             <Link to="/tareas" className="btn btn--secondary">Ver tablero</Link>
             <Link to="/proyectos" className="btn btn--primary">Nuevo proyecto</Link>
           </>
@@ -67,6 +72,32 @@ export default function Dashboard() {
         ))}
       </section>
 
+      {finanzas && (
+        <section className="summary-cards" style={{ marginTop: '1.25rem' }}>
+          <article className="summary-card">
+            <span className="summary-card__label">Ingresos totales (CLP)</span>
+            <strong className="summary-card__value">{formatCLP(finanzas.ingresosTotales)}</strong>
+          </article>
+          <article className="summary-card">
+            <span className="summary-card__label">Costos totales</span>
+            <strong className="summary-card__value">{formatCLP(finanzas.costosTotales)}</strong>
+          </article>
+          <article className={`summary-card${Number(finanzas.gananciaNeta) >= 0 ? '' : ' summary-card--danger'}`}>
+            <span className="summary-card__label">Ganancia neta</span>
+            <strong className="summary-card__value">{formatCLP(finanzas.gananciaNeta)}</strong>
+            <span className={`summary-card__hint badge ${margenBadgeClass(finanzas.margenEmpresaPorcentaje)}`}>
+              Margen {formatMargen(finanzas.margenEmpresaPorcentaje)}
+            </span>
+          </article>
+          <article className="summary-card">
+            <span className="summary-card__label">Proyectos rentables</span>
+            <strong className="summary-card__value">
+              {finanzas.proyectosRentables} / {finanzas.proyectos?.length ?? 0}
+            </strong>
+          </article>
+        </section>
+      )}
+
       <section className="panels">
         <Card className="panel panel--animated">
           <h4>Trabajadores recientes</h4>
@@ -80,6 +111,7 @@ export default function Dashboard() {
                     <th>Nombre</th>
                     <th>Rol</th>
                     <th>Email</th>
+                    <th>Sueldo mensual</th>
                     <th>Capacidad</th>
                   </tr>
                 </thead>
@@ -89,6 +121,7 @@ export default function Dashboard() {
                       <td>{u.nombre}</td>
                       <td><span className="badge">{u.rol}</span></td>
                       <td>{u.email}</td>
+                      <td>{formatCLP(u.sueldoMensualClp)}</td>
                       <td>{u.capacidadHoras} h/sem</td>
                     </tr>
                   ))}
@@ -109,15 +142,23 @@ export default function Dashboard() {
                   <tr>
                     <th>Nombre</th>
                     <th>Estado</th>
-                    <th>Descripción</th>
+                    <th>Ingresos (CLP)</th>
+                    <th>Margen</th>
                   </tr>
                 </thead>
                 <tbody>
                   {dashboard.proyectos.map((p) => (
                     <tr key={p.id}>
                       <td>{p.nombre}</td>
-                      <td><span className="badge badge--info">{p.estado}</span></td>
-                      <td className="cell-truncate">{p.descripcion}</td>
+                      <td><span className="badge badge--info">{p.estado?.replace('_', ' ')}</span></td>
+                      <td>{formatCLP(p.ingresosContrato)}</td>
+                      <td>
+                        {p.margenPorcentaje != null ? (
+                          <span className={`badge ${margenBadgeClass(p.margenPorcentaje)}`}>
+                            {formatMargen(p.margenPorcentaje)}
+                          </span>
+                        ) : '—'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { formatMoney } from '../../utils/money'
+import { formatCLP, formatCLPCompact } from '../../utils/money'
 
 const CATEGORY_COLORS = [
   '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4',
@@ -38,8 +38,8 @@ export default function ProjectFinancialCharts({ finanzas }) {
           <BarChart data={barData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
             <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-            <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-            <Tooltip formatter={(v) => formatMoney(v)} />
+            <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => formatCLPCompact(v)} />
+            <Tooltip formatter={(v) => formatCLP(v)} />
             <Bar dataKey="valor" radius={[6, 6, 0, 0]}>
               <Cell fill="#f97316" />
               <Cell fill="#6366f1" />
@@ -67,7 +67,7 @@ export default function ProjectFinancialCharts({ finanzas }) {
                   <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(v) => formatMoney(v)} />
+              <Tooltip formatter={(v) => formatCLP(v)} />
               <Legend />
             </PieChart>
           </ResponsiveContainer>
