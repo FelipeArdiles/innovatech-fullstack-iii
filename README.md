@@ -14,7 +14,8 @@ Arquitectura de microservicios para la gestión integral de proyectos tecnológi
         │ lb://bff-gateway (Eureka)
         ▼
 [BFF :8081] ──RestClient + LoadBalancer──► [ms-usuarios :8082]
-         └────────────────────────────────► [ms-proyectos :8083]
+         ├────────────────────────────────► [ms-proyectos :8083]
+         └────────────────────────────────► [ms-tareas :8084]
                         │
                         ▼
               [Eureka Server :8761]
@@ -73,6 +74,7 @@ cd eureka-server && ./mvnw spring-boot:run
 # 3. Microservicios
 cd ms-usuarios && ./mvnw spring-boot:run
 cd ms-proyectos && ./mvnw spring-boot:run
+cd ms-tareas && ./mvnw spring-boot:run
 
 # 4. BFF
 cd bff-gateway && ./mvnw spring-boot:run
@@ -109,6 +111,7 @@ SpringDoc OpenAPI 3. En desarrollo local, con cada servicio levantado:
 | BFF | http://localhost:8081/swagger-ui/index.html | http://localhost:8081/v3/api-docs |
 | MS Usuarios | http://localhost:8082/swagger-ui/index.html | http://localhost:8082/v3/api-docs |
 | MS Proyectos | http://localhost:8083/swagger-ui/index.html | http://localhost:8083/v3/api-docs |
+| MS Tareas | http://localhost:8084/swagger-ui/index.html | http://localhost:8084/v3/api-docs |
 
 Vía **API Gateway** (rutas proxy sin JWT; la API `/api/**` sí exige token):
 
@@ -137,9 +140,11 @@ Base URL: `http://localhost:8080` (requiere `Authorization: Bearer <token>`)
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| GET | `/api/dashboard` | KPIs agregados |
+| GET | `/api/dashboard` | KPIs agregados (usuarios, proyectos, tareas) |
 | GET/POST/PUT/DELETE | `/api/usuarios` | CRUD usuarios |
+| GET/POST/PUT/DELETE | `/api/trabajadores` | CRUD trabajadores (alias usuarios) |
 | GET/POST/PUT/DELETE | `/api/proyectos` | CRUD proyectos |
+| GET/POST/PUT/DELETE | `/api/tareas` | CRUD tareas Kanban (`?proyectoId=` opcional) |
 
 ## Pruebas unitarias
 
@@ -149,6 +154,7 @@ cd api-gateway && ./mvnw test
 cd bff-gateway && ./mvnw test
 cd ms-usuarios && ./mvnw test
 cd ms-proyectos && ./mvnw test
+cd ms-tareas && ./mvnw test
 ```
 
 ## Flujo de ramas
@@ -175,4 +181,5 @@ El repositorio usa **GitHub Flow simplificado** sobre `master` (rama principal e
 - `bff-gateway` – Backend for Frontend
 - `ms-usuarios` – Recursos humanos
 - `ms-proyectos` – Gestión de proyectos
-- `frontend-app` – React + Keycloak JS
+- `ms-tareas` – Tareas Kanban por proyecto
+- `frontend-app` – React + Keycloak JS (Dashboard KPIs, Trabajadores, Proyectos, Tablero Trello)

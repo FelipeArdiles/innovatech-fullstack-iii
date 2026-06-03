@@ -3,6 +3,7 @@ package cl.innovatech.bff_gateway.service;
 import cl.innovatech.bff_gateway.client.MicroserviceClient;
 import cl.innovatech.bff_gateway.dto.DashboardDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
+import cl.innovatech.bff_gateway.dto.TareaDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,20 @@ public class BffService {
 	public DashboardDto getDashboard() {
 		List<UsuarioDto> usuarios = microserviceClient.getUsuarios();
 		List<ProyectoDto> proyectos = microserviceClient.getProyectos();
+		List<TareaDto> tareas = microserviceClient.getTareas();
+		long porHacer = tareas.stream().filter(t -> "POR_HACER".equals(t.getEstado())).count();
+		long enProgreso = tareas.stream().filter(t -> "EN_PROGRESO".equals(t.getEstado())).count();
+		long hechas = tareas.stream().filter(t -> "HECHO".equals(t.getEstado())).count();
 		return new DashboardDto(
 			usuarios.size(),
 			proyectos.size(),
+			tareas.size(),
+			(int) porHacer,
+			(int) enProgreso,
+			(int) hechas,
 			usuarios,
-			proyectos
+			proyectos,
+			tareas
 		);
 	}
 
@@ -66,5 +76,25 @@ public class BffService {
 
 	public void deleteProyecto(Long id) {
 		microserviceClient.deleteProyecto(id);
+	}
+
+	public List<TareaDto> getTareas(Long proyectoId) {
+		return microserviceClient.getTareas(proyectoId);
+	}
+
+	public TareaDto getTarea(Long id) {
+		return microserviceClient.getTarea(id);
+	}
+
+	public TareaDto createTarea(TareaDto tarea) {
+		return microserviceClient.createTarea(tarea);
+	}
+
+	public TareaDto updateTarea(Long id, TareaDto tarea) {
+		return microserviceClient.updateTarea(id, tarea);
+	}
+
+	public void deleteTarea(Long id) {
+		microserviceClient.deleteTarea(id);
 	}
 }
