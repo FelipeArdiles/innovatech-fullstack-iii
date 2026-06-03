@@ -23,7 +23,28 @@ Arquitectura de microservicios para la gestión integral de proyectos tecnológi
 
 - **API Gateway**: único punto expuesto al exterior; valida tokens OAuth2/OIDC.
 - **BFF**: orquesta llamadas a microservicios vía discovery (sin URLs hardcodeadas).
-- **Microservicios**: persistencia JPA/H2, no expuestos al cliente.
+- **Microservicios**: persistencia JPA/PostgreSQL (una BD por MS), no expuestos al cliente.
+
+### Bases de datos (PostgreSQL)
+
+```
+                    ┌─────────────────────────────────────┐
+                    │  postgres :5432 (volumen persistente) │
+                    │  usuario: innovatech                 │
+                    └──────────┬──────────────┬────────────┘
+                               │              │
+              ┌────────────────┼──────────────┼────────────────┐
+              ▼                ▼              ▼                │
+        DB usuarios      DB proyectos    DB tareas              │
+              │                │              │                │
+       ms-usuarios       ms-proyectos     ms-tareas             │
+```
+
+- **Docker Compose**: servicio `postgres` + script `docker/postgres/init/01-databases.sql` crea `usuarios`, `proyectos` y `tareas` en el primer arranque.
+- **Perfil `docker`**: cada MS usa `application-docker.yml` (`jdbc:postgresql://postgres:5432/<db>`).
+- **Seed (solo la primera vez)**: cada `DataLoader` carga el dataset demo completo (30 trabajadores, 10 proyectos con finanzas CLP, 47 tareas con dificultad/categoría/valor) **únicamente si** `repository.count() == 0`. Nunca ejecuta `deleteAll()` al arranque.
+- **Persistencia de tus cambios**: los datos que creas o editas en la UI quedan en el volumen Docker `innovatech_postgres_data`. `docker compose restart` y `docker compose down` **sin** `-v` conservan la base; solo `docker compose down -v` elimina el volumen y fuerza un nuevo seed en el próximo `up`.
+- **Local sin Compose**: levantar Postgres en `localhost:5432` con las mismas credenciales (ver `.env.example`) o usar solo `docker compose up postgres -d` y ejecutar los MS con `./mvnw spring-boot:run`.
 
 ## Requisitos
 
@@ -36,12 +57,26 @@ Arquitectura de microservicios para la gestión integral de proyectos tecnológi
 
 ```bash
 cd "/Users/felipeardiles/Documents/Duoc UC/Proyectos/fullstack III Innovatech"
+cp .env.example .env   # opcional; valores por defecto en compose
 docker compose up --build
 ```
+
+> **Datos demo vs. tus datos**: el seed se inserta solo cuando las tablas están vacías (primer arranque o volumen nuevo). Tus altas/edits en la UI persisten en `innovatech_postgres_data`; no uses `docker compose down -v` si quieres conservarlos.
+
+**PostgreSQL (desarrollo)** — copiar de `.env.example`, no commitear `.env` con secretos reales:
+
+| Variable | Valor por defecto |
+|----------|-------------------|
+| `POSTGRES_USER` | `innovatech` |
+| `POSTGRES_PASSWORD` | `innovatech_dev` |
+| Host (desde el host) | `localhost:5432` |
+| Bases | `usuarios`, `proyectos`, `tareas` |
+| Volumen persistente | `innovatech_postgres_data` |
 
 Servicios:
 | Componente     | Puerto |
 |----------------|--------|
+| PostgreSQL     | 5432   |
 | Keycloak       | 8180   |
 | Eureka         | 8761   |
 | API Gateway    | 8080   |
@@ -71,18 +106,21 @@ docker run -p 8180:8180 \
 # 2. Eureka
 cd eureka-server && ./mvnw spring-boot:run
 
-# 3. Microservicios
+# 3. PostgreSQL (bases usuarios / proyectos / tareas)
+docker compose up postgres -d
+
+# 4. Microservicios (requieren Postgres en localhost:5432)
 cd ms-usuarios && ./mvnw spring-boot:run
 cd ms-proyectos && ./mvnw spring-boot:run
 cd ms-tareas && ./mvnw spring-boot:run
 
-# 4. BFF
+# 5. BFF
 cd bff-gateway && ./mvnw spring-boot:run
 
-# 5. API Gateway
+# 6. API Gateway
 cd api-gateway && ./mvnw spring-boot:run
 
-# 6. Frontend
+# 7. Frontend
 cd frontend-app && npm install && npm run dev
 ```
 
