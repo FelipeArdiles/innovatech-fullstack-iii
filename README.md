@@ -6,6 +6,8 @@ Arquitectura de microservicios para la gestión integral de proyectos tecnológi
 
 **Arquitectura y comunicación entre módulos:** [Diagrama de comunicación](docs/DIAGRAMA_COMUNICACION.md) (puertos, JWT, Eureka, Circuit Breaker, flujos login y datos).
 
+**Flujo de una petición (usuario → respuesta en UI):** [Diagrama de flujo de petición](docs/DIAGRAMA_FLUJO_PETICION.md) · [SVG gráfico](docs/assets/flujo-peticion.svg)
+
 ## Arquitectura
 
 ```

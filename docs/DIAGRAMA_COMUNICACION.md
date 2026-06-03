@@ -223,4 +223,4 @@ Si algún microservicio falla de forma repetida, el Circuit Breaker correspondie
 
 ---
 
-Ver también: [Guía de inicio](GUIA_INICIO.md) · [README principal](../README.md)
+Ver también: [Flujo de petición usuario → UI](DIAGRAMA_FLUJO_PETICION.md) · [Guía de inicio](GUIA_INICIO.md) · [README principal](../README.md)
