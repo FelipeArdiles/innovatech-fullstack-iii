@@ -13,6 +13,7 @@ import './App.css'
 
 const ProjectDetailPage = lazy(() => import('./pages/ProjectDetailPage'))
 const CapacidadPage = lazy(() => import('./pages/CapacidadPage'))
+const FinanzasEmpresaPage = lazy(() => import('./pages/FinanzasEmpresaPage'))
 
 const AUTH_INIT_TIMEOUT_MS = 15000
 
@@ -97,6 +98,14 @@ function App() {
               element={
                 <LazyPage>
                   <CapacidadPage />
+                </LazyPage>
+              }
+            />
+            <Route
+              path="finanzas"
+              element={
+                <LazyPage>
+                  <FinanzasEmpresaPage />
                 </LazyPage>
               }
             />

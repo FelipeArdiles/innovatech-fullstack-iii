@@ -1096,6 +1096,143 @@
   color: #b45309;
 }
 
+/* Project hub */
+.page--hub {
+  max-width: 1200px;
+}
+
+.project-hub__welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgb(99 102 241 / 8%), rgb(16 185 129 / 6%));
+  border: 1px solid var(--color-border);
+}
+
+.project-hub__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+}
+
+.project-hub__welcome h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.65rem;
+}
+
+.project-hub__description {
+  margin: 0;
+  max-width: 52rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+}
+
+.project-hub__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1.25rem;
+  padding: 0.25rem;
+  background: var(--color-bg-muted);
+  border-radius: var(--radius-md);
+}
+
+.project-hub__tab {
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background var(--duration-fast), color var(--duration-fast);
+}
+
+.project-hub__tab:hover {
+  color: var(--color-text);
+  background: rgb(255 255 255 / 60%);
+}
+
+.project-hub__tab--active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.project-hub__filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.project-hub__filters select {
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  font-size: 0.85rem;
+}
+
+.proyecto-card__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.summary-cards--compact {
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.fin-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.fin-charts__block h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.fin-portfolio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.fin-portfolio__row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--duration-fast), box-shadow var(--duration-fast);
+}
+
+.fin-portfolio__row:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.fin-portfolio__row > div:first-child {
+  flex: 1;
+  min-width: 180px;
+}
+
 /* Detalle proyecto y capacidad */
 .detail-badges {
   display: flex;

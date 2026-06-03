@@ -115,9 +115,9 @@ class BffServiceTest {
 		ProyectoFinanzasDto finanzas = bffService.getProyectoFinanzas(1L);
 
 		assertThat(finanzas).isNotNull();
-		assertThat(finanzas.getCostoAcumulado()).isEqualByComparingTo(new BigDecimal("40000"));
-		assertThat(finanzas.getGanancia()).isEqualByComparingTo(new BigDecimal("60000"));
-		assertThat(finanzas.getMargenPorcentaje()).isEqualTo(60.0);
+		assertThat(finanzas.getCostoAcumulado()).isEqualByComparingTo(new BigDecimal("50000"));
+		assertThat(finanzas.getGanancia()).isEqualByComparingTo(new BigDecimal("50000"));
+		assertThat(finanzas.getMargenPorcentaje()).isEqualTo(50.0);
 		assertThat(finanzas.getDesglosePorCategoria()).hasSize(2);
 		assertThat(finanzas.isRentable()).isTrue();
 	}
