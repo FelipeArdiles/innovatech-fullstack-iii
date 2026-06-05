@@ -1,116 +1,169 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 620" font-family="Segoe UI, system-ui, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 780" font-family="Segoe UI, system-ui, sans-serif">
   <defs>
     <linearGradient id="brand" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#4f46e5"/>
       <stop offset="100%" stop-color="#7c3aed"/>
     </linearGradient>
+    <linearGradient id="worker" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
       <path d="M0,0 L8,4 L0,8 Z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#3b82f6"/>
+    </marker>
+    <marker id="arrow-indigo" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#6366f1"/>
     </marker>
     <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
       <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.12"/>
     </filter>
   </defs>
 
-  <rect width="920" height="620" fill="#f8fafc"/>
-  <text x="460" y="36" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Innovatech - Arquitectura y comunicacion logica</text>
-  <text x="460" y="58" text-anchor="middle" font-size="12" fill="#64748b">BFF + microservicios + API Gateway + Eureka + Keycloak + PostgreSQL</text>
+  <rect width="1000" height="780" fill="#f8fafc"/>
+  <text x="500" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Innovatech - Arquitectura y comunicacion logica</text>
+  <text x="500" y="56" text-anchor="middle" font-size="12" fill="#64748b">4 microservicios · roles admin/trabajador · notificaciones · miembros de proyecto</text>
 
   <!-- Capa Cliente -->
-  <rect x="40" y="80" width="840" height="72" rx="10" fill="#e0e7ff" stroke="#c7d2fe"/>
-  <text x="60" y="102" font-size="11" font-weight="600" fill="#4338ca">CAPA CLIENTE</text>
-  <rect x="340" y="108" width="240" height="36" rx="8" fill="#fff" stroke="#4f46e5" filter="url(#shadow)"/>
-  <text x="460" y="131" text-anchor="middle" font-size="13" font-weight="600" fill="#312e81">Frontend React :5173</text>
+  <rect x="30" y="72" width="940" height="118" rx="10" fill="#e0e7ff" stroke="#c7d2fe"/>
+  <text x="50" y="94" font-size="11" font-weight="600" fill="#4338ca">CAPA CLIENTE — Frontend React :5173</text>
 
-  <!-- Keycloak -->
-  <rect x="40" y="168" width="200" height="56" rx="8" fill="#fff7ed" stroke="#fdba74" filter="url(#shadow)"/>
-  <text x="140" y="192" text-anchor="middle" font-size="12" font-weight="600" fill="#9a3412">Keycloak :8180</text>
-  <text x="140" y="210" text-anchor="middle" font-size="10" fill="#c2410c">OIDC / JWT</text>
+  <rect x="50" y="108" width="280" height="68" rx="8" fill="#fff" stroke="#4f46e5" filter="url(#shadow)"/>
+  <text x="190" y="130" text-anchor="middle" font-size="12" font-weight="600" fill="#312e81">Panel Administrador</text>
+  <text x="190" y="146" text-anchor="middle" font-size="10" fill="#64748b">demo / demo123 · rol admin</text>
+  <text x="190" y="162" text-anchor="middle" font-size="9" fill="#64748b">CRUD · finanzas · equipo · avisos</text>
 
-  <!-- API Gateway -->
-  <rect x="340" y="168" width="240" height="56" rx="8" fill="url(#brand)" filter="url(#shadow)"/>
-  <text x="460" y="192" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">API Gateway :8080</text>
-  <text x="460" y="210" text-anchor="middle" font-size="10" fill="#e0e7ff">Unico punto expuesto - valida JWT</text>
+  <rect x="360" y="108" width="280" height="68" rx="8" fill="#fff" stroke="#0ea5e9" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="500" y="130" text-anchor="middle" font-size="12" font-weight="600" fill="#0369a1">Panel Trabajador</text>
+  <text x="500" y="146" text-anchor="middle" font-size="10" fill="#64748b">ana / diego · rol trabajador</text>
+  <text x="500" y="162" text-anchor="middle" font-size="9" fill="#64748b">mi-panel · mis tareas · comentarios</text>
 
-  <!-- Eureka -->
-  <rect x="680" y="168" width="200" height="56" rx="8" fill="#ecfdf5" stroke="#6ee7b7" filter="url(#shadow)"/>
-  <text x="780" y="192" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">Eureka :8761</text>
-  <text x="780" y="210" text-anchor="middle" font-size="10" fill="#047857">Service Discovery</text>
+  <rect x="670" y="108" width="280" height="68" rx="8" fill="#fff" stroke="#a78bfa" filter="url(#shadow)"/>
+  <text x="810" y="130" text-anchor="middle" font-size="12" font-weight="600" fill="#5b21b6">Campana notificaciones</text>
+  <text x="810" y="148" text-anchor="middle" font-size="9" fill="#64748b">tareas · plazos · avisos · equipo</text>
+  <text x="810" y="164" text-anchor="middle" font-size="9" fill="#64748b">GET /api/notificaciones</text>
+
+  <!-- Keycloak / Gateway / Eureka -->
+  <rect x="30" y="208" width="200" height="64" rx="8" fill="#fff7ed" stroke="#fdba74" filter="url(#shadow)"/>
+  <text x="130" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="#9a3412">Keycloak :8180</text>
+  <text x="130" y="248" text-anchor="middle" font-size="10" fill="#c2410c">realm innovatech · OIDC/JWT</text>
+  <text x="130" y="262" text-anchor="middle" font-size="9" fill="#c2410c">roles: admin, trabajador</text>
+
+  <rect x="380" y="208" width="240" height="64" rx="8" fill="url(#brand)" filter="url(#shadow)"/>
+  <text x="500" y="232" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">API Gateway :8080</text>
+  <text x="500" y="248" text-anchor="middle" font-size="10" fill="#e0e7ff">Unico punto expuesto · valida JWT</text>
+  <text x="500" y="262" text-anchor="middle" font-size="9" fill="#e0e7ff">/api/** → BFF (mayoria)</text>
+
+  <rect x="770" y="208" width="200" height="64" rx="8" fill="#ecfdf5" stroke="#6ee7b7" filter="url(#shadow)"/>
+  <text x="870" y="232" text-anchor="middle" font-size="12" font-weight="600" fill="#065f46">Eureka :8761</text>
+  <text x="870" y="248" text-anchor="middle" font-size="10" fill="#047857">Service Discovery</text>
+  <text x="870" y="262" text-anchor="middle" font-size="9" fill="#047857">lb:// microservicios</text>
 
   <!-- BFF -->
-  <rect x="300" y="260" width="320" height="56" rx="8" fill="#fff" stroke="#6366f1" stroke-width="2" filter="url(#shadow)"/>
-  <text x="460" y="284" text-anchor="middle" font-size="13" font-weight="600" fill="#3730a3">BFF Gateway :8081</text>
-  <text x="460" y="302" text-anchor="middle" font-size="10" fill="#64748b">Orquestacion + Circuit Breaker (Resilience4j)</text>
+  <rect x="220" y="296" width="560" height="72" rx="8" fill="#fff" stroke="#6366f1" stroke-width="2" filter="url(#shadow)"/>
+  <text x="500" y="320" text-anchor="middle" font-size="13" font-weight="600" fill="#3730a3">BFF Gateway :8081</text>
+  <text x="500" y="338" text-anchor="middle" font-size="10" fill="#64748b">Orquestacion · Circuit Breaker (Resilience4j) · JWT email → perfil trabajador</text>
+  <text x="500" y="354" text-anchor="middle" font-size="9" fill="#64748b">/mi-panel · /notificaciones · /comentarios · /proyectos/{id}/miembros · /avisos · eventos de alerta</text>
 
   <!-- Microservicios -->
-  <rect x="40" y="340" width="840" height="100" rx="10" fill="#f1f5f9" stroke="#cbd5e1"/>
-  <text x="60" y="362" font-size="11" font-weight="600" fill="#475569">MICROSERVICIOS (no expuestos al navegador)</text>
+  <rect x="30" y="388" width="940" height="128" rx="10" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="50" y="410" font-size="11" font-weight="600" fill="#475569">MICROSERVICIOS (no expuestos al navegador)</text>
 
-  <rect x="80" y="378" width="220" height="48" rx="8" fill="#fff" stroke="#94a3b8" filter="url(#shadow)"/>
-  <text x="190" y="400" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">ms-usuarios :8082</text>
-  <text x="190" y="416" text-anchor="middle" font-size="10" fill="#64748b">Trabajadores / CRUD</text>
+  <rect x="50" y="424" width="210" height="76" rx="8" fill="#fff" stroke="#94a3b8" filter="url(#shadow)"/>
+  <text x="155" y="446" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">ms-usuarios :8082</text>
+  <text x="155" y="462" text-anchor="middle" font-size="10" fill="#64748b">Trabajadores / CRUD</text>
+  <text x="155" y="478" text-anchor="middle" font-size="9" fill="#64748b">catalogo roles · 20-45 h/sem</text>
+  <text x="155" y="492" text-anchor="middle" font-size="9" fill="#64748b">vinculo email Keycloak</text>
 
-  <rect x="350" y="378" width="220" height="48" rx="8" fill="#fff" stroke="#94a3b8" filter="url(#shadow)"/>
-  <text x="460" y="400" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">ms-proyectos :8083</text>
-  <text x="460" y="416" text-anchor="middle" font-size="10" fill="#64748b">Proyectos / finanzas</text>
+  <rect x="280" y="424" width="210" height="76" rx="8" fill="#fff" stroke="#94a3b8" filter="url(#shadow)"/>
+  <text x="385" y="446" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">ms-proyectos :8083</text>
+  <text x="385" y="462" text-anchor="middle" font-size="10" fill="#64748b">Proyectos / finanzas CLP</text>
+  <text x="385" y="478" text-anchor="middle" font-size="9" fill="#64748b">proyecto_miembros</text>
+  <text x="385" y="492" text-anchor="middle" font-size="9" fill="#64748b">admin agrega/quita equipo</text>
 
-  <rect x="620" y="378" width="220" height="48" rx="8" fill="#fff" stroke="#94a3b8" filter="url(#shadow)"/>
-  <text x="730" y="400" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">ms-tareas :8084</text>
-  <text x="730" y="416" text-anchor="middle" font-size="10" fill="#64748b">Tareas / Kanban</text>
+  <rect x="510" y="424" width="210" height="76" rx="8" fill="#fff" stroke="#94a3b8" filter="url(#shadow)"/>
+  <text x="615" y="446" text-anchor="middle" font-size="12" font-weight="600" fill="#0f172a">ms-tareas :8084</text>
+  <text x="615" y="462" text-anchor="middle" font-size="10" fill="#64748b">Tareas / Kanban</text>
+  <text x="615" y="478" text-anchor="middle" font-size="9" fill="#64748b">estados · dificultad ALTA</text>
+  <text x="615" y="492" text-anchor="middle" font-size="9" fill="#64748b">asignacion → notificacion</text>
+
+  <rect x="740" y="424" width="210" height="76" rx="8" fill="#fff" stroke="#c4b5fd" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="845" y="446" text-anchor="middle" font-size="12" font-weight="600" fill="#5b21b6">ms-notificaciones :8085</text>
+  <text x="845" y="462" text-anchor="middle" font-size="10" fill="#64748b">Comentarios en tareas</text>
+  <text x="845" y="478" text-anchor="middle" font-size="9" fill="#64748b">notificaciones por usuario</text>
+  <text x="845" y="492" text-anchor="middle" font-size="9" fill="#64748b">plazos · avisos · equipo</text>
 
   <!-- PostgreSQL -->
-  <rect x="40" y="468" width="840" height="88" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
-  <text x="60" y="490" font-size="11" font-weight="600" fill="#1d4ed8">PERSISTENCIA (PostgreSQL :5432 - volumen persistente)</text>
+  <rect x="30" y="536" width="940" height="100" rx="10" fill="#eff6ff" stroke="#93c5fd"/>
+  <text x="50" y="558" font-size="11" font-weight="600" fill="#1d4ed8">PERSISTENCIA — PostgreSQL :5432 (volumen innovatech_postgres_data · db-bootstrap)</text>
 
-  <ellipse cx="190" cy="530" rx="70" ry="22" fill="#fff" stroke="#3b82f6"/>
-  <text x="190" y="535" text-anchor="middle" font-size="11" fill="#1e40af">DB usuarios</text>
+  <ellipse cx="155" cy="600" rx="72" ry="22" fill="#fff" stroke="#3b82f6"/>
+  <text x="155" y="605" text-anchor="middle" font-size="11" fill="#1e40af">DB usuarios</text>
 
-  <ellipse cx="460" cy="530" rx="70" ry="22" fill="#fff" stroke="#3b82f6"/>
-  <text x="460" y="535" text-anchor="middle" font-size="11" fill="#1e40af">DB proyectos</text>
+  <ellipse cx="385" cy="600" rx="72" ry="22" fill="#fff" stroke="#3b82f6"/>
+  <text x="385" y="605" text-anchor="middle" font-size="11" fill="#1e40af">DB proyectos</text>
 
-  <ellipse cx="730" cy="530" rx="70" ry="22" fill="#fff" stroke="#3b82f6"/>
-  <text x="730" y="535" text-anchor="middle" font-size="11" fill="#1e40af">DB tareas</text>
+  <ellipse cx="615" cy="600" rx="72" ry="22" fill="#fff" stroke="#3b82f6"/>
+  <text x="615" y="605" text-anchor="middle" font-size="11" fill="#1e40af">DB tareas</text>
 
-  <!-- Flechas principales -->
-  <line x1="460" y1="144" x2="460" y2="168" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="475" y="160" font-size="9" fill="#64748b">HTTP + JWT</text>
+  <ellipse cx="845" cy="600" rx="82" ry="22" fill="#fff" stroke="#8b5cf6"/>
+  <text x="845" y="605" text-anchor="middle" font-size="11" fill="#5b21b6">DB notificaciones</text>
 
-  <line x1="200" y1="144" x2="200" y2="168" stroke="#fdba74" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="215" y="160" font-size="9" fill="#c2410c">Login OIDC</text>
+  <!-- Flechas cliente -->
+  <line x1="500" y1="190" x2="500" y2="208" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="515" y="202" font-size="9" fill="#64748b">HTTP + Bearer JWT</text>
 
-  <line x1="460" y1="224" x2="460" y2="260" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="475" y="248" font-size="9" fill="#64748b">/api/** (mayoria)</text>
+  <line x1="130" y1="190" x2="130" y2="208" stroke="#fdba74" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="145" y="202" font-size="9" fill="#c2410c">Login OIDC</text>
 
-  <line x1="520" y1="224" x2="730" y2="378" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-  <text x="640" y="300" font-size="9" fill="#64748b">/api/tareas directo</text>
+  <!-- Gateway → BFF -->
+  <line x1="500" y1="272" x2="500" y2="296" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
 
-  <line x1="400" y1="224" x2="190" y2="378" stroke="#64748b" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
-  <text x="280" y="300" font-size="9" fill="#64748b">/api/trabajadores</text>
+  <!-- BFF → MS (4) -->
+  <line x1="320" y1="368" x2="155" y2="424" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+  <line x1="420" y1="368" x2="385" y2="424" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+  <line x1="580" y1="368" x2="615" y2="424" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+  <line x1="680" y1="368" x2="845" y2="424" stroke="#7c3aed" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+  <text x="500" y="392" text-anchor="middle" font-size="9" fill="#6366f1">RestClient + lb:// (Eureka)</text>
 
-  <line x1="400" y1="316" x2="190" y2="378" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="460" y1="316" x2="460" y2="378" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
-  <line x1="520" y1="316" x2="730" y2="378" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- Gateway rutas directas (legacy) -->
+  <line x1="420" y1="272" x2="155" y2="424" stroke="#64748b" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <text x="250" y="350" font-size="8" fill="#94a3b8">/api/trabajadores directo</text>
+  <line x1="580" y1="272" x2="615" y2="424" stroke="#64748b" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+  <text x="640" y="350" font-size="8" fill="#94a3b8">/api/tareas directo</text>
 
-  <line x1="190" y1="426" x2="190" y2="508" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="460" y1="426" x2="460" y2="508" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <line x1="730" y1="426" x2="730" y2="508" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="460" y="455" text-anchor="middle" font-size="9" fill="#3b82f6">JDBC (una BD por microservicio)</text>
+  <!-- MS → DB -->
+  <line x1="155" y1="500" x2="155" y2="578" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <line x1="385" y1="500" x2="385" y2="578" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <line x1="615" y1="500" x2="615" y2="578" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <line x1="845" y1="500" x2="845" y2="578" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <text x="500" y="528" text-anchor="middle" font-size="9" fill="#3b82f6">JDBC — una BD por microservicio</text>
 
-  <!-- Eureka dotted -->
-  <line x1="780" y1="224" x2="580" y2="260" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,4"/>
-  <line x1="780" y1="224" x2="190" y2="378" stroke="#10b981" stroke-width="1" stroke-dasharray="4,4"/>
-  <line x1="780" y1="224" x2="460" y2="378" stroke="#10b981" stroke-width="1" stroke-dasharray="4,4"/>
-  <line x1="780" y1="224" x2="730" y2="378" stroke="#10b981" stroke-width="1" stroke-dasharray="4,4"/>
-  <text x="800" y="250" font-size="9" fill="#059669">registro lb://</text>
+  <!-- Eureka -->
+  <line x1="870" y1="272" x2="620" y2="296" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <line x1="870" y1="272" x2="155" y2="424" stroke="#10b981" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="870" y1="272" x2="385" y2="424" stroke="#10b981" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="870" y1="272" x2="615" y2="424" stroke="#10b981" stroke-width="1" stroke-dasharray="4,4"/>
+  <line x1="870" y1="272" x2="845" y2="424" stroke="#10b981" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="890" y="290" font-size="9" fill="#059669">registro</text>
+
+  <!-- Eventos BFF (notificaciones) -->
+  <rect x="30" y="656" width="940" height="52" rx="8" fill="#faf5ff" stroke="#ddd6fe"/>
+  <text x="50" y="678" font-size="11" font-weight="600" fill="#6d28d9">EVENTOS DE NOTIFICACION (BFF → ms-notificaciones)</text>
+  <text x="50" y="696" font-size="9" fill="#7c3aed">TAREA_ASIGNADA · TAREA_COMPLETADA (ALTA) · PLAZO_PROXIMO/VENCIDO · AVISO_PROYECTO · COMENTARIO_TAREA · MIEMBRO_AGREGADO/REMOVIDO</text>
 
   <!-- Leyenda -->
-  <rect x="40" y="575" width="840" height="32" rx="6" fill="#fff" stroke="#e2e8f0"/>
-  <line x1="60" y1="591" x2="90" y2="591" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="100" y="595" font-size="10" fill="#475569">HTTP sincrono</text>
-  <line x1="220" y1="591" x2="250" y2="591" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,4"/>
-  <text x="260" y="595" font-size="10" fill="#475569">Eureka (descubrimiento)</text>
-  <line x1="420" y1="591" x2="450" y2="591" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="460" y="595" font-size="10" fill="#475569">JDBC PostgreSQL</text>
-  <text x="700" y="595" font-size="10" fill="#475569">Sin BD: Gateway, BFF, Eureka, Frontend</text>
+  <rect x="30" y="722" width="940" height="44" rx="6" fill="#fff" stroke="#e2e8f0"/>
+  <line x1="50" y1="744" x2="80" y2="744" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="90" y="748" font-size="10" fill="#475569">HTTP sincrono</text>
+  <line x1="200" y1="744" x2="230" y2="744" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,4"/>
+  <text x="240" y="748" font-size="10" fill="#475569">Eureka</text>
+  <line x1="320" y1="744" x2="350" y2="744" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <text x="360" y="748" font-size="10" fill="#475569">JDBC PostgreSQL</text>
+  <line x1="500" y1="744" x2="530" y2="744" stroke="#6366f1" stroke-width="2" marker-end="url(#arrow-indigo)"/>
+  <text x="540" y="748" font-size="10" fill="#475569">BFF → MS</text>
+  <text x="720" y="748" font-size="10" fill="#475569">Sin BD: Gateway, BFF, Eureka, Frontend, Keycloak</text>
 </svg>
