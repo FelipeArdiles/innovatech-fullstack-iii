@@ -12,7 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import cl.innovatech.ms_usuarios.validation.TrabajadorValidationException;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -29,7 +32,7 @@ class UsuarioServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		usuario = new Usuario(1L, "Ana Torres", "Desarrolladora", "ana@innovatech.cl", 40, 1_200_000L);
+		usuario = new Usuario(1L, "Ana Torres", "Desarrolladora Full Stack", "ana@innovatech.cl", 40, 1_200_000L);
 	}
 
 	@Test
@@ -45,7 +48,7 @@ class UsuarioServiceTest {
 		when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
 
 		Usuario created = usuarioService.create(
-			new Usuario(null, "Ana Torres", "Desarrolladora", "ana@innovatech.cl", 40, 1_200_000L));
+			new Usuario(null, "Ana Torres", "Desarrolladora Full Stack", "ana@innovatech.cl", 40, 1_200_000L));
 
 		assertThat(created.getNombre()).isEqualTo("Ana Torres");
 		verify(usuarioRepository).save(any(Usuario.class));
@@ -56,6 +59,20 @@ class UsuarioServiceTest {
 		when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
 		assertThat(usuarioService.update(99L, usuario)).isEmpty();
+	}
+
+	@Test
+	void createRejectsRolNoPermitido() {
+		assertThatThrownBy(() -> usuarioService.create(
+			new Usuario(null, "Test", "Rol Inventado", "test@innovatech.cl", 40, 1_000_000L)))
+			.isInstanceOf(TrabajadorValidationException.class);
+	}
+
+	@Test
+	void createRejectsCapacidadFueraDeRango() {
+		assertThatThrownBy(() -> usuarioService.create(
+			new Usuario(null, "Test", "Desarrollador Backend", "test@innovatech.cl", 10, 1_000_000L)))
+			.isInstanceOf(TrabajadorValidationException.class);
 	}
 
 	@Test

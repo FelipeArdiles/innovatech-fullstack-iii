@@ -586,6 +586,14 @@
   font-weight: 400;
 }
 
+.field-hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
 /* Kanban */
 .kanban {
   display: grid;

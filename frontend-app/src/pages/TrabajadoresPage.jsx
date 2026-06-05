@@ -6,19 +6,36 @@ import PageHeader from '../components/ui/PageHeader'
 import Button from '../components/ui/Button'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
 import { formatCLP } from '../utils/money'
+import {
+  ROLES_TRABAJADOR,
+  HORAS_SEMANALES_MIN,
+  HORAS_SEMANALES_MAX,
+  isRolValido,
+  isCapacidadHorasValida,
+} from '../utils/trabajadorCatalogo'
 
-const EMPTY_FORM = { nombre: '', rol: '', email: '', capacidadHoras: '' }
+const EMPTY_FORM = { nombre: '', rol: '', email: '', capacidadHoras: '40' }
 
 function validate(form) {
   const errors = {}
   if (!form.nombre.trim()) errors.nombre = 'Nombre requerido'
-  if (!form.rol.trim()) errors.rol = 'Rol requerido'
+  if (!form.rol.trim()) errors.rol = 'Debes seleccionar un rol'
+  else if (!isRolValido(form.rol)) errors.rol = 'Rol no válido — elige una opción del listado'
   if (!form.email.trim()) errors.email = 'Email requerido'
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.email = 'Email inválido'
-  if (form.capacidadHoras === '' || Number(form.capacidadHoras) < 0) {
-    errors.capacidadHoras = 'Capacidad requerida (≥ 0)'
+  if (form.capacidadHoras === '') {
+    errors.capacidadHoras = 'Capacidad requerida'
+  } else if (!isCapacidadHorasValida(form.capacidadHoras)) {
+    errors.capacidadHoras = `Debe estar entre ${HORAS_SEMANALES_MIN} y ${HORAS_SEMANALES_MAX} h/sem`
   }
   return errors
+}
+
+function rolesParaFormulario(rolActual) {
+  if (rolActual && !ROLES_TRABAJADOR.includes(rolActual)) {
+    return [rolActual, ...ROLES_TRABAJADOR]
+  }
+  return ROLES_TRABAJADOR
 }
 
 export default function TrabajadoresPage() {
@@ -158,7 +175,12 @@ export default function TrabajadoresPage() {
             </label>
             <label>
               Rol *
-              <input name="rol" value={form.rol} onChange={handleChange} placeholder="Ej: Desarrollador" />
+              <select name="rol" value={form.rol} onChange={handleChange}>
+                <option value="">Seleccionar rol…</option>
+                {rolesParaFormulario(form.rol).map((rol) => (
+                  <option key={rol} value={rol}>{rol}</option>
+                ))}
+              </select>
               {formErrors.rol && <span className="field-error">{formErrors.rol}</span>}
             </label>
             <label>
@@ -171,10 +193,15 @@ export default function TrabajadoresPage() {
               <input
                 name="capacidadHoras"
                 type="number"
-                min="0"
+                min={HORAS_SEMANALES_MIN}
+                max={HORAS_SEMANALES_MAX}
+                step="1"
                 value={form.capacidadHoras}
                 onChange={handleChange}
               />
+              <span className="field-hint">
+                Entre {HORAS_SEMANALES_MIN} y {HORAS_SEMANALES_MAX} horas semanales
+              </span>
               {formErrors.capacidadHoras && (
                 <span className="field-error">{formErrors.capacidadHoras}</span>
               )}

@@ -2,6 +2,8 @@ package cl.innovatech.ms_usuarios.service;
 
 import cl.innovatech.ms_usuarios.entity.Usuario;
 import cl.innovatech.ms_usuarios.repository.UsuarioRepository;
+import cl.innovatech.ms_usuarios.validation.TrabajadorCatalogo;
+import cl.innovatech.ms_usuarios.validation.TrabajadorValidationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +29,13 @@ public class UsuarioService {
 	}
 
 	public Usuario create(Usuario usuario) {
+		validarTrabajador(usuario);
 		usuario.setId(null);
 		return usuarioRepository.save(usuario);
 	}
 
 	public Optional<Usuario> update(Long id, Usuario usuario) {
+		validarTrabajador(usuario);
 		return usuarioRepository.findById(id).map(existing -> {
 			existing.setNombre(usuario.getNombre());
 			existing.setRol(usuario.getRol());
@@ -39,6 +43,19 @@ public class UsuarioService {
 			existing.setCapacidadHoras(usuario.getCapacidadHoras());
 			return usuarioRepository.save(existing);
 		});
+	}
+
+	private void validarTrabajador(Usuario usuario) {
+		if (!TrabajadorCatalogo.esRolValido(usuario.getRol())) {
+			throw new TrabajadorValidationException(
+				"Rol no permitido. Debe seleccionar un rol del catálogo definido.");
+		}
+		if (!TrabajadorCatalogo.esCapacidadHorasValida(usuario.getCapacidadHoras())) {
+			throw new TrabajadorValidationException(
+				"Capacidad horaria inválida. Debe estar entre "
+					+ TrabajadorCatalogo.HORAS_SEMANALES_MIN + " y "
+					+ TrabajadorCatalogo.HORAS_SEMANALES_MAX + " horas semanales.");
+		}
 	}
 
 	public boolean delete(Long id) {
