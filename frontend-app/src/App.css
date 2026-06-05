@@ -1210,6 +1210,7 @@
   text-underline-offset: 2px;
 }
 
+.fin-portfolio {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

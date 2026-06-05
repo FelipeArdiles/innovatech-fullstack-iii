@@ -38,6 +38,14 @@ export default function InicioPage() {
           <h3>Tablero Trello</h3>
           <p>Kanban por proyecto con estados.</p>
         </Link>
+        <Link to="/finanzas" className="inicio-card">
+          <h3>Finanzas empresa</h3>
+          <p>Ingresos, costos y márgenes en pesos chilenos.</p>
+        </Link>
+        <Link to="/capacidad" className="inicio-card">
+          <h3>Capacidad del equipo</h3>
+          <p>Horas, nómina y sobrecarga por trabajador.</p>
+        </Link>
       </div>
     </div>
   )
