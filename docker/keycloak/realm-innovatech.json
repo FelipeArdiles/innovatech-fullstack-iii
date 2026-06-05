@@ -17,6 +17,10 @@
       {
         "name": "admin",
         "description": "Administrador"
+      },
+      {
+        "name": "trabajador",
+        "description": "Trabajador / desarrollador con permisos limitados"
       }
     ]
   },
@@ -35,7 +39,39 @@
           "temporary": false
         }
       ],
-      "realmRoles": ["user"]
+      "realmRoles": ["admin", "user"]
+    },
+    {
+      "username": "ana",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Ana",
+      "lastName": "Torres",
+      "email": "ana@innovatech.cl",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ana123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["trabajador", "user"]
+    },
+    {
+      "username": "diego",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Diego",
+      "lastName": "Fernández",
+      "email": "diego@innovatech.cl",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "diego123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["trabajador", "user"]
     },
     {
       "username": "admin",

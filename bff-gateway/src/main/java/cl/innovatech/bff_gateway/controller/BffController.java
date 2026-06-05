@@ -1,11 +1,18 @@
 package cl.innovatech.bff_gateway.controller;
 
 import cl.innovatech.bff_gateway.dto.CapacidadEquipoDto;
+import cl.innovatech.bff_gateway.dto.ComentarioTareaDto;
+import cl.innovatech.bff_gateway.dto.CrearAvisoProyectoRequest;
+import cl.innovatech.bff_gateway.dto.CrearComentarioRequest;
 import cl.innovatech.bff_gateway.dto.DashboardDto;
 import cl.innovatech.bff_gateway.dto.FinanzasResumenDto;
+import cl.innovatech.bff_gateway.dto.MiPanelDto;
+import cl.innovatech.bff_gateway.dto.NotificacionDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDetalleDto;
+import cl.innovatech.bff_gateway.util.JwtClaimsExtractor;
 import cl.innovatech.bff_gateway.dto.ProyectoFinanzasDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
+import cl.innovatech.bff_gateway.dto.ProyectoMiembroDto;
 import cl.innovatech.bff_gateway.dto.TareaDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
 import cl.innovatech.bff_gateway.service.BffService;
@@ -28,6 +35,15 @@ public class BffController {
 	@GetMapping("/dashboard")
 	public DashboardDto dashboard() {
 		return bffService.getDashboard();
+	}
+
+	@GetMapping("/mi-panel")
+	public ResponseEntity<MiPanelDto> miPanel(
+			@RequestHeader(value = "Authorization", required = false) String authorization) {
+		String email = JwtClaimsExtractor.extractEmail(authorization).orElse(null);
+		String username = JwtClaimsExtractor.extractPreferredUsername(authorization).orElse(null);
+		MiPanelDto panel = bffService.getMiPanel(email, username);
+		return panel != null ? ResponseEntity.ok(panel) : ResponseEntity.notFound().build();
 	}
 
 	@GetMapping("/usuarios")
@@ -125,6 +141,93 @@ public class BffController {
 	public ResponseEntity<Void> deleteProyecto(@PathVariable Long id) {
 		bffService.deleteProyecto(id);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/proyectos/{proyectoId}/miembros")
+	public List<ProyectoMiembroDto> listMiembrosProyecto(@PathVariable Long proyectoId) {
+		return bffService.getMiembrosProyecto(proyectoId);
+	}
+
+	@PostMapping("/proyectos/{proyectoId}/miembros")
+	public ResponseEntity<ProyectoMiembroDto> agregarMiembroProyecto(
+			@PathVariable Long proyectoId,
+			@RequestBody java.util.Map<String, Long> body) {
+		Long trabajadorId = body.get("trabajadorId");
+		if (trabajadorId == null) {
+			return ResponseEntity.badRequest().build();
+		}
+		ProyectoMiembroDto miembro = bffService.agregarMiembroProyecto(proyectoId, trabajadorId);
+		return miembro != null
+			? ResponseEntity.status(HttpStatus.CREATED).body(miembro)
+			: ResponseEntity.notFound().build();
+	}
+
+	@DeleteMapping("/proyectos/{proyectoId}/miembros/{trabajadorId}")
+	public ResponseEntity<Void> quitarMiembroProyecto(
+			@PathVariable Long proyectoId,
+			@PathVariable Long trabajadorId) {
+		bffService.quitarMiembroProyecto(proyectoId, trabajadorId);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/proyectos/{proyectoId}/avisos")
+	public ResponseEntity<java.util.Map<String, Integer>> publicarAvisoProyecto(
+			@PathVariable Long proyectoId,
+			@RequestBody CrearAvisoProyectoRequest request,
+			@RequestHeader(value = "Authorization", required = false) String authorization) {
+		String email = JwtClaimsExtractor.extractEmail(authorization).orElse(null);
+		String username = JwtClaimsExtractor.extractPreferredUsername(authorization).orElse(null);
+		int enviadas = bffService.publicarAvisoProyecto(proyectoId, request.getMensaje(), email, username);
+		return enviadas > 0
+			? ResponseEntity.status(HttpStatus.CREATED).body(java.util.Map.of("enviadas", enviadas))
+			: ResponseEntity.badRequest().build();
+	}
+
+	@GetMapping("/comentarios")
+	public List<ComentarioTareaDto> listComentarios(@RequestParam Long tareaId) {
+		return bffService.getComentariosTarea(tareaId);
+	}
+
+	@PostMapping("/comentarios")
+	public ResponseEntity<ComentarioTareaDto> crearComentario(
+			@RequestBody CrearComentarioRequest request,
+			@RequestHeader(value = "Authorization", required = false) String authorization) {
+		String email = JwtClaimsExtractor.extractEmail(authorization).orElse(null);
+		String username = JwtClaimsExtractor.extractPreferredUsername(authorization).orElse(null);
+		ComentarioTareaDto creado = bffService.crearComentarioTarea(request, email, username);
+		return creado != null
+			? ResponseEntity.status(HttpStatus.CREATED).body(creado)
+			: ResponseEntity.badRequest().build();
+	}
+
+	@GetMapping("/notificaciones")
+	public List<NotificacionDto> listNotificaciones(
+			@RequestHeader(value = "Authorization", required = false) String authorization) {
+		String email = JwtClaimsExtractor.extractEmail(authorization).orElse(null);
+		String username = JwtClaimsExtractor.extractPreferredUsername(authorization).orElse(null);
+		return bffService.getNotificacionesUsuario(email, username);
+	}
+
+	@GetMapping("/notificaciones/pendientes")
+	public java.util.Map<String, Long> notificacionesPendientes(
+			@RequestHeader(value = "Authorization", required = false) String authorization) {
+		String email = JwtClaimsExtractor.extractEmail(authorization).orElse(null);
+		String username = JwtClaimsExtractor.extractPreferredUsername(authorization).orElse(null);
+		return java.util.Map.of("count", bffService.getNotificacionesPendientes(email, username));
+	}
+
+	@PatchMapping("/notificaciones/{id}/leida")
+	public ResponseEntity<NotificacionDto> marcarNotificacionLeida(@PathVariable Long id) {
+		NotificacionDto updated = bffService.marcarNotificacionLeida(id);
+		return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
+	}
+
+	@PatchMapping("/notificaciones/marcar-todas")
+	public java.util.Map<String, Integer> marcarTodasNotificaciones(
+			@RequestHeader(value = "Authorization", required = false) String authorization) {
+		String email = JwtClaimsExtractor.extractEmail(authorization).orElse(null);
+		String username = JwtClaimsExtractor.extractPreferredUsername(authorization).orElse(null);
+		return java.util.Map.of("marcadas", bffService.marcarTodasNotificacionesLeidas(email, username));
 	}
 
 	@GetMapping("/tareas")

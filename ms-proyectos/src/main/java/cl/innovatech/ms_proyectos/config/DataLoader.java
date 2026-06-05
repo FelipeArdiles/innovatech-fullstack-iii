@@ -1,6 +1,8 @@
 package cl.innovatech.ms_proyectos.config;
 
 import cl.innovatech.ms_proyectos.entity.Proyecto;
+import cl.innovatech.ms_proyectos.entity.ProyectoMiembro;
+import cl.innovatech.ms_proyectos.repository.ProyectoMiembroRepository;
 import cl.innovatech.ms_proyectos.repository.ProyectoRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,31 @@ import java.time.LocalDate;
 
 @Configuration
 public class DataLoader {
+
+	@Bean
+	CommandLineRunner initMiembros(ProyectoMiembroRepository miembroRepository) {
+		return args -> {
+			if (miembroRepository.count() > 0) {
+				return;
+			}
+			// Proyecto 1 — Portal Clientes B2B
+			m(miembroRepository, 1L, 1L, 4L, 5L, 6L, 7L, 11L);
+			// Proyecto 2 — App Móvil Retail
+			m(miembroRepository, 2L, 2L, 4L, 5L, 8L);
+			// Proyecto 4 — BI Analytics
+			m(miembroRepository, 4L, 6L, 13L, 30L);
+			// Proyecto 5 — API Pagos
+			m(miembroRepository, 5L, 1L, 4L, 12L, 16L);
+			// Proyecto 7 — Chatbot IA
+			m(miembroRepository, 7L, 5L, 18L, 19L);
+		};
+	}
+
+	private static void m(ProyectoMiembroRepository repo, Long proyectoId, Long... trabajadorIds) {
+		for (Long tid : trabajadorIds) {
+			repo.save(new ProyectoMiembro(null, proyectoId, tid));
+		}
+	}
 
 	@Bean
 	CommandLineRunner initProyectos(ProyectoRepository repository) {

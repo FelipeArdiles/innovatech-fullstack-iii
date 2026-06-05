@@ -53,6 +53,12 @@ spring:
                 - Path=/docs/ms-proyectos/**
               filters:
                 - RewritePath=/docs/ms-proyectos/(?<segment>.*), /${segment}
+            - id: docs-ms-notificaciones
+              uri: lb://ms-notificaciones
+              predicates:
+                - Path=/docs/ms-notificaciones/**
+              filters:
+                - RewritePath=/docs/ms-notificaciones/(?<segment>.*), /${segment}
     discovery:
       enabled: true
 

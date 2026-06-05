@@ -4,7 +4,8 @@ import { initAuth } from './auth/keycloak'
 import Layout from './components/Layout'
 import ErrorBoundary from './components/ErrorBoundary'
 import InicioPage from './pages/InicioPage'
-import Dashboard from './pages/Dashboard'
+import DashboardRouter from './pages/DashboardRouter'
+import RoleGuard from './components/RoleGuard'
 import TrabajadoresPage from './pages/TrabajadoresPage'
 import ProyectosPage from './pages/ProyectosPage'
 import TareasPage from './pages/TareasPage'
@@ -81,8 +82,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<InicioPage />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="trabajadores" element={<TrabajadoresPage />} />
+            <Route path="dashboard" element={<DashboardRouter />} />
+            <Route path="trabajadores" element={<RoleGuard adminOnly><TrabajadoresPage /></RoleGuard>} />
             <Route path="usuarios" element={<Navigate to="/trabajadores" replace />} />
             <Route path="proyectos" element={<ProyectosPage />} />
             <Route
@@ -96,17 +97,21 @@ function App() {
             <Route
               path="capacidad"
               element={
-                <LazyPage>
-                  <CapacidadPage />
-                </LazyPage>
+                <RoleGuard adminOnly>
+                  <LazyPage>
+                    <CapacidadPage />
+                  </LazyPage>
+                </RoleGuard>
               }
             />
             <Route
               path="finanzas"
               element={
-                <LazyPage>
-                  <FinanzasEmpresaPage />
-                </LazyPage>
+                <RoleGuard adminOnly>
+                  <LazyPage>
+                    <FinanzasEmpresaPage />
+                  </LazyPage>
+                </RoleGuard>
               }
             />
             <Route path="tareas" element={<TareasPage />} />

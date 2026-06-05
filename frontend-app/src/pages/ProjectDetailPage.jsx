@@ -12,6 +12,7 @@ import CapacityChart from '../components/charts/CapacityChart'
 import DifficultyChart from '../components/charts/DifficultyChart'
 import { timelinePercent } from '../utils/projectDates'
 import { formatCLP, formatMargen, margenBadgeClass, OTROS_GASTOS_TOOLTIP } from '../utils/money'
+import { isAdmin } from '../auth/roles'
 
 const ProjectFinancialCharts = lazy(() => import('../components/charts/ProjectFinancialCharts'))
 
@@ -30,7 +31,10 @@ export default function ProjectDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
-  const tab = searchParams.get('tab') || 'resumen'
+  const admin = isAdmin()
+  const visibleTabs = admin ? TABS : TABS.filter((t) => t.id !== 'finanzas')
+  const tabParam = searchParams.get('tab') || 'resumen'
+  const tab = !admin && tabParam === 'finanzas' ? 'resumen' : tabParam
 
   const [proyecto, setProyecto] = useState(null)
   const [finanzas, setFinanzas] = useState(null)
@@ -39,6 +43,13 @@ export default function ProjectDetailPage() {
   const [error, setError] = useState('')
   const [filtroDificultad, setFiltroDificultad] = useState('')
   const [filtroCategoria, setFiltroCategoria] = useState('')
+  const [todosTrabajadores, setTodosTrabajadores] = useState([])
+  const [miembros, setMiembros] = useState([])
+  const [nuevoMiembroId, setNuevoMiembroId] = useState('')
+  const [miembrosLoading, setMiembrosLoading] = useState(false)
+  const [miembrosFlash, setMiembrosFlash] = useState('')
+  const [avisoTexto, setAvisoTexto] = useState('')
+  const [avisoEnviando, setAvisoEnviando] = useState(false)
 
   const load = useCallback(() => {
     setLoading(true)
@@ -52,6 +63,63 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     load()
   }, [load])
+
+  const loadMiembros = useCallback(() => {
+    if (!admin || tab !== 'equipo') return
+    setMiembrosLoading(true)
+    Promise.all([api.getMiembrosProyecto(id), api.getTrabajadores()])
+      .then(([miembrosData, trabajadoresData]) => {
+        setMiembros(miembrosData)
+        setTodosTrabajadores(trabajadoresData)
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setMiembrosLoading(false))
+  }, [admin, tab, id])
+
+  useEffect(() => {
+    loadMiembros()
+  }, [loadMiembros])
+
+  async function handleAgregarMiembro() {
+    if (!nuevoMiembroId) return
+    try {
+      await api.agregarMiembroProyecto(id, Number(nuevoMiembroId))
+      setMiembrosFlash('Miembro agregado al proyecto')
+      setNuevoMiembroId('')
+      await load()
+      loadMiembros()
+    } catch (err) {
+      setMiembrosFlash(err.message)
+    }
+    setTimeout(() => setMiembrosFlash(''), 3000)
+  }
+
+  async function handlePublicarAviso() {
+    if (!avisoTexto.trim()) return
+    setAvisoEnviando(true)
+    try {
+      const res = await api.publicarAvisoProyecto(id, avisoTexto.trim())
+      setMiembrosFlash(`Aviso enviado a ${res?.enviadas ?? 0} persona(s)`)
+      setAvisoTexto('')
+    } catch (err) {
+      setMiembrosFlash(err.message)
+    } finally {
+      setAvisoEnviando(false)
+    }
+    setTimeout(() => setMiembrosFlash(''), 4000)
+  }
+
+  async function handleQuitarMiembro(trabajadorId) {
+    try {
+      await api.quitarMiembroProyecto(id, trabajadorId)
+      setMiembrosFlash('Miembro removido del proyecto')
+      await load()
+      loadMiembros()
+    } catch (err) {
+      setMiembrosFlash(err.message)
+    }
+    setTimeout(() => setMiembrosFlash(''), 3000)
+  }
 
   useEffect(() => {
     if (tab !== 'finanzas' || finanzas || finanzasLoading) return
@@ -140,7 +208,7 @@ export default function ProjectDetailPage() {
       </div>
 
       <nav className="project-hub__tabs" aria-label="Secciones del proyecto">
-        {TABS.map(({ id: tabId, label }) => (
+        {visibleTabs.map(({ id: tabId, label }) => (
           <button
             key={tabId}
             type="button"
@@ -250,6 +318,66 @@ export default function ProjectDetailPage() {
 
       {tab === 'equipo' && (
         <div className="detail-grid">
+          {admin && (
+            <section className="detail-card detail-card--wide">
+              <h3>Gestionar miembros del proyecto</h3>
+              {miembrosFlash && <p className="detail-meta">{miembrosFlash}</p>}
+              <div className="miembros-admin">
+                <select
+                  value={nuevoMiembroId}
+                  onChange={(e) => setNuevoMiembroId(e.target.value)}
+                  disabled={miembrosLoading}
+                >
+                  <option value="">Agregar trabajador…</option>
+                  {todosTrabajadores
+                    .filter((t) => !miembros.some((m) => m.trabajadorId === t.id))
+                    .map((t) => (
+                      <option key={t.id} value={t.id}>{t.nombre} — {t.rol}</option>
+                    ))}
+                </select>
+                <Button onClick={handleAgregarMiembro} disabled={!nuevoMiembroId || miembrosLoading}>
+                  Agregar
+                </Button>
+              </div>
+              <ul className="detail-team-list">
+                {miembros.map((m) => {
+                  const t = todosTrabajadores.find((x) => x.id === m.trabajadorId)
+                    || (proyecto.trabajadores ?? []).find((x) => x.id === m.trabajadorId)
+                  return (
+                    <li key={m.id ?? m.trabajadorId} className="miembros-admin__row">
+                      <span>{t?.nombre ?? `Trabajador #${m.trabajadorId}`}</span>
+                      <span className="detail-meta">{t?.rol ?? 'Miembro'}</span>
+                      <Button variant="danger" size="sm" onClick={() => handleQuitarMiembro(m.trabajadorId)}>
+                        Quitar
+                      </Button>
+                    </li>
+                  )
+                })}
+                {!miembrosLoading && !miembros.length && (
+                  <li className="detail-meta">No hay miembros registrados. Agrega trabajadores al equipo.</li>
+                )}
+              </ul>
+            </section>
+          )}
+          {admin && (
+            <section className="detail-card detail-card--wide">
+              <h3>Avisos del proyecto</h3>
+              <p className="detail-meta">
+                Publica un aviso general para todos los miembros del equipo (llegará como notificación).
+              </p>
+              <textarea
+                className="aviso-proyecto__input"
+                rows={3}
+                placeholder="Ej.: Reunión de sincronización mañana a las 10:00…"
+                value={avisoTexto}
+                onChange={(e) => setAvisoTexto(e.target.value)}
+                disabled={avisoEnviando}
+              />
+              <Button onClick={handlePublicarAviso} disabled={!avisoTexto.trim() || avisoEnviando}>
+                {avisoEnviando ? 'Enviando…' : 'Publicar aviso'}
+              </Button>
+            </section>
+          )}
           <section className="detail-card">
             <h3>Equipo asignado</h3>
             <WorkerAvatars trabajadores={proyecto.trabajadores} max={10} />
@@ -258,10 +386,12 @@ export default function ProjectDetailPage() {
                 const horas = (proyecto.tareas || [])
                   .filter((ta) => ta.asignadoId === t.id)
                   .reduce((s, ta) => s + (ta.horasEstimadas || 0), 0)
+                const esMiembro = miembros.some((m) => m.trabajadorId === t.id)
                 return (
                   <li key={t.id}>
                     <span>{t.nombre}</span>
                     <span className="detail-meta">{t.rol}</span>
+                    {esMiembro && <span className="badge badge--info">Miembro</span>}
                     <span className="detail-meta">{horas} h en proyecto · {t.capacidadHoras ?? 0} h/sem</span>
                   </li>
                 )

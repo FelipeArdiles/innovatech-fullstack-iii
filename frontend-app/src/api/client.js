@@ -21,7 +21,14 @@ async function authFetch(path, options = {}) {
   }
   if (!response.ok) {
     const message = await response.text()
-    throw new Error(message || `Error ${response.status}`)
+    let detail = message || `Error ${response.status}`
+    try {
+      const json = JSON.parse(message)
+      detail = json.message || json.error || detail
+    } catch {
+      /* respuesta no JSON */
+    }
+    throw new Error(detail)
   }
   if (response.status === 204) {
     return null
@@ -31,6 +38,7 @@ async function authFetch(path, options = {}) {
 
 export const api = {
   getDashboard: () => authFetch('/api/dashboard'),
+  getMiPanel: () => authFetch('/api/mi-panel'),
 
   getUsuarios: () => authFetch('/api/usuarios'),
   getUsuario: (id) => authFetch(`/api/usuarios/${id}`),
@@ -74,4 +82,34 @@ export const api = {
     authFetch(`/api/tareas/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteTarea: (id) =>
     authFetch(`/api/tareas/${id}`, { method: 'DELETE' }),
+
+  getMiembrosProyecto: (proyectoId) =>
+    authFetch(`/api/proyectos/${proyectoId}/miembros`),
+  agregarMiembroProyecto: (proyectoId, trabajadorId) =>
+    authFetch(`/api/proyectos/${proyectoId}/miembros`, {
+      method: 'POST',
+      body: JSON.stringify({ trabajadorId }),
+    }),
+  quitarMiembroProyecto: (proyectoId, trabajadorId) =>
+    authFetch(`/api/proyectos/${proyectoId}/miembros/${trabajadorId}`, { method: 'DELETE' }),
+  publicarAvisoProyecto: (proyectoId, mensaje) =>
+    authFetch(`/api/proyectos/${proyectoId}/avisos`, {
+      method: 'POST',
+      body: JSON.stringify({ mensaje }),
+    }),
+
+  getComentarios: (tareaId) =>
+    authFetch(`/api/comentarios?tareaId=${tareaId}`),
+  crearComentario: (tareaId, texto) =>
+    authFetch('/api/comentarios', {
+      method: 'POST',
+      body: JSON.stringify({ tareaId, texto }),
+    }),
+
+  getNotificaciones: () => authFetch('/api/notificaciones'),
+  getNotificacionesPendientes: () => authFetch('/api/notificaciones/pendientes'),
+  marcarNotificacionLeida: (id) =>
+    authFetch(`/api/notificaciones/${id}/leida`, { method: 'PATCH' }),
+  marcarTodasNotificaciones: () =>
+    authFetch('/api/notificaciones/marcar-todas', { method: 'PATCH' }),
 }

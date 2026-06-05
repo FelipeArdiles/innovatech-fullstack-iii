@@ -19,7 +19,8 @@ Arquitectura de microservicios para la gestión integral de proyectos tecnológi
         ▼
 [BFF :8081] ──RestClient + LoadBalancer──► [ms-usuarios :8082]
          ├────────────────────────────────► [ms-proyectos :8083]
-         └────────────────────────────────► [ms-tareas :8084]
+         ├────────────────────────────────► [ms-tareas :8084]
+         └────────────────────────────────► [ms-notificaciones :8085]
                         │
                         ▼
               [Eureka Server :8761]
@@ -39,12 +40,12 @@ Arquitectura de microservicios para la gestión integral de proyectos tecnológi
                                │              │
               ┌────────────────┼──────────────┼────────────────┐
               ▼                ▼              ▼                │
-        DB usuarios      DB proyectos    DB tareas              │
-              │                │              │                │
-       ms-usuarios       ms-proyectos     ms-tareas             │
+   DB usuarios   DB proyectos   DB tareas   DB notificaciones     │
+              │                │              │         │        │
+       ms-usuarios       ms-proyectos     ms-tareas  ms-notificaciones
 ```
 
-- **Docker Compose**: servicio `postgres` + script `docker/postgres/init/01-databases.sql` crea `usuarios`, `proyectos` y `tareas` en el primer arranque.
+- **Docker Compose**: servicio `postgres` + script `docker/postgres/init/01-databases.sql` crea `usuarios`, `proyectos`, `tareas` y `notificaciones` en el primer arranque.
 - **Perfil `docker`**: cada MS usa `application-docker.yml` (`jdbc:postgresql://postgres:5432/<db>`).
 - **Seed (solo la primera vez)**: cada `DataLoader` carga el dataset demo completo (30 trabajadores, 10 proyectos con finanzas CLP, 47 tareas con dificultad/categoría/valor) **únicamente si** `repository.count() == 0`. Nunca ejecuta `deleteAll()` al arranque.
 - **Persistencia de tus cambios**: los datos que creas o editas en la UI quedan en el volumen Docker `innovatech_postgres_data`. `docker compose restart` y `docker compose down` **sin** `-v` conservan la base; solo `docker compose down -v` elimina el volumen y fuerza un nuevo seed en el próximo `up`.
@@ -74,7 +75,7 @@ docker compose up --build
 | `POSTGRES_USER` | `innovatech` |
 | `POSTGRES_PASSWORD` | `innovatech_dev` |
 | Host (desde el host) | `localhost:5432` |
-| Bases | `usuarios`, `proyectos`, `tareas` |
+| Bases | `usuarios`, `proyectos`, `tareas`, `notificaciones` |
 | Volumen persistente | `innovatech_postgres_data` |
 
 Servicios:
@@ -117,6 +118,7 @@ docker compose up postgres -d
 cd ms-usuarios && ./mvnw spring-boot:run
 cd ms-proyectos && ./mvnw spring-boot:run
 cd ms-tareas && ./mvnw spring-boot:run
+cd ms-notificaciones && ./mvnw spring-boot:run
 
 # 5. BFF
 cd bff-gateway && ./mvnw spring-boot:run
@@ -135,8 +137,10 @@ cd frontend-app && npm install && npm run dev
 | URL | `http://localhost:8180` |
 | Realm | `innovatech` |
 | Client ID | `innovatech-frontend` |
-| Usuario demo | `demo` / `demo123` |
-| Admin | `admin` / `admin123` |
+| Usuario admin (demo) | `demo` / `demo123` — rol `admin`, dashboard completo |
+| Usuario trabajador | `ana` / `ana123` — rol `trabajador`, vinculado a Ana Torres (`ana@innovatech.cl`) |
+| Usuario trabajador | `diego` / `diego123` — rol `trabajador`, vinculado a Diego Fernández (`diego@innovatech.cl`) |
+| Admin Keycloak | `admin` / `admin123` |
 
 Consola admin Keycloak: `http://localhost:8180/admin` (admin/admin)
 
@@ -154,6 +158,7 @@ SpringDoc OpenAPI 3. En desarrollo local, con cada servicio levantado:
 | MS Usuarios | http://localhost:8082/swagger-ui/index.html | http://localhost:8082/v3/api-docs |
 | MS Proyectos | http://localhost:8083/swagger-ui/index.html | http://localhost:8083/v3/api-docs |
 | MS Tareas | http://localhost:8084/swagger-ui/index.html | http://localhost:8084/v3/api-docs |
+| MS Notificaciones | http://localhost:8085/swagger-ui/index.html | http://localhost:8085/v3/api-docs |
 
 Vía **API Gateway** (rutas proxy sin JWT; la API `/api/**` sí exige token):
 
@@ -187,6 +192,24 @@ Base URL: `http://localhost:8080` (requiere `Authorization: Bearer <token>`)
 | GET/POST/PUT/DELETE | `/api/trabajadores` | CRUD trabajadores (alias usuarios) |
 | GET/POST/PUT/DELETE | `/api/proyectos` | CRUD proyectos |
 | GET/POST/PUT/DELETE | `/api/tareas` | CRUD tareas Kanban (`?proyectoId=` opcional) |
+| GET/POST/DELETE | `/api/proyectos/{id}/miembros` | Miembros del proyecto (admin) |
+| GET/POST | `/api/comentarios` | Comentarios en tareas (`?tareaId=`) |
+| GET/PATCH | `/api/notificaciones` | Notificaciones del usuario autenticado |
+| POST | `/api/proyectos/{id}/avisos` | Aviso general del proyecto a miembros (admin) |
+
+### Tipos de notificación
+
+El BFF genera alertas automáticas según eventos que involucran al usuario:
+
+| Tipo | Cuándo se dispara |
+|------|-------------------|
+| `TAREA_ASIGNADA` | Admin crea o reasigna una tarea |
+| `TAREA_COMPLETADA` | Tarea de dificultad ALTA marcada como hecha |
+| `PLAZO_PROXIMO` | Proyecto o tarea asignada vence en ≤3 días |
+| `PLAZO_VENCIDO` | Proyecto atrasado o tarea en proyecto vencido |
+| `AVISO_PROYECTO` | Admin publica aviso en pestaña Equipo |
+| `COMENTARIO_TAREA` | Alguien comenta en una tarea del proyecto |
+| `MIEMBRO_AGREGADO` / `MIEMBRO_REMOVIDO` | Cambios en el equipo del proyecto |
 
 ## Pruebas unitarias
 
@@ -197,6 +220,7 @@ cd bff-gateway && ./mvnw test
 cd ms-usuarios && ./mvnw test
 cd ms-proyectos && ./mvnw test
 cd ms-tareas && ./mvnw test
+cd ms-notificaciones && ./mvnw test
 ```
 
 ## Flujo de ramas
@@ -224,4 +248,5 @@ El repositorio usa **GitHub Flow simplificado** sobre `master` (rama principal e
 - `ms-usuarios` – Recursos humanos
 - `ms-proyectos` – Gestión de proyectos
 - `ms-tareas` – Tareas Kanban por proyecto
-- `frontend-app` – React + Keycloak JS (Dashboard KPIs, Trabajadores, Proyectos, Tablero Trello)
+- `ms-notificaciones` – Comentarios en tareas y notificaciones
+- `frontend-app` – React + Keycloak JS (Dashboard KPIs, Trabajadores, Proyectos, Tablero Trello, campana de avisos)

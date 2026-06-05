@@ -1493,3 +1493,346 @@
   margin-top: 1.25rem;
   overflow-x: auto;
 }
+
+/* —— Roles y panel trabajador —— */
+.badge--admin {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border: none;
+}
+
+.badge--worker {
+  background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+  color: #fff;
+  border: none;
+}
+
+.sidebar__role-pill {
+  margin: 0 1rem 0.75rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-md);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+.sidebar__role-pill.badge--admin {
+  background: rgb(99 102 241 / 18%);
+  color: #4f46e5;
+  border: 1px solid rgb(99 102 241 / 35%);
+}
+
+.sidebar__role-pill.badge--worker {
+  background: rgb(14 165 233 / 14%);
+  color: #0284c7;
+  border: 1px solid rgb(14 165 233 / 35%);
+}
+
+.account-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--color-border);
+}
+
+.account-banner--admin {
+  background: linear-gradient(135deg, rgb(99 102 241 / 8%), rgb(139 92 246 / 6%));
+  border-color: rgb(99 102 241 / 25%);
+}
+
+.account-banner--worker {
+  background: linear-gradient(135deg, rgb(14 165 233 / 10%), rgb(6 182 212 / 6%));
+  border-color: rgb(14 165 233 / 28%);
+}
+
+.account-banner__eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: 0.2rem;
+}
+
+.account-banner strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.account-banner p {
+  margin: 0.35rem 0 0;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.worker-project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.worker-project-card {
+  display: block;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.worker-project-card:hover {
+  border-color: rgb(14 165 233 / 45%);
+  box-shadow: 0 4px 14px rgb(14 165 233 / 12%);
+}
+
+.worker-project-card strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.worker-project-card__desc {
+  margin: 0.5rem 0;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+.worker-project-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* Notificaciones (campana) */
+.notif-bell {
+  position: relative;
+  margin-left: auto;
+}
+
+.notif-bell__trigger {
+  position: relative;
+  background: var(--color-bg-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.65rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.notif-bell__badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 1.1rem;
+  height: 1.1rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-bell__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: min(22rem, 90vw);
+  max-height: 24rem;
+  overflow: auto;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+}
+
+.notif-bell__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.notif-bell__header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.notif-bell__mark-all {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.notif-bell__empty {
+  padding: 1rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.notif-bell__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notif-bell__item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.notif-bell__item--read {
+  opacity: 0.65;
+}
+
+.notif-bell__msg {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.notif-bell__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.notif-bell__meta button,
+.notif-bell__meta a {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: none;
+}
+
+.notif-bell__tipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-full, 999px);
+}
+
+.notif-tipo--task { background: rgb(99 102 241 / 12%); color: #4f46e5; }
+.notif-tipo--done { background: rgb(34 197 94 / 12%); color: #15803d; }
+.notif-tipo--deadline { background: rgb(245 158 11 / 14%); color: #b45309; }
+.notif-tipo--late { background: rgb(239 68 68 / 12%); color: #dc2626; }
+.notif-tipo--broadcast { background: rgb(14 165 233 / 12%); color: #0284c7; }
+.notif-tipo--comment { background: rgb(168 85 247 / 12%); color: #7c3aed; }
+.notif-tipo--team { background: rgb(20 184 166 / 12%); color: #0f766e; }
+.notif-tipo--default { background: var(--color-bg-muted); color: var(--color-text-muted); }
+
+.aviso-proyecto__input {
+  width: 100%;
+  margin: 0.75rem 0;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+/* Comentarios en tareas */
+.task-comments {
+  margin-top: 0.5rem;
+  border-top: 1px dashed var(--color-border);
+  padding-top: 0.5rem;
+}
+
+.task-comments__toggle {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.task-comments__panel {
+  margin-top: 0.5rem;
+}
+
+.task-comments__list {
+  list-style: none;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  max-height: 8rem;
+  overflow-y: auto;
+}
+
+.task-comments__list li {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.78rem;
+}
+
+.task-comments__list li p {
+  margin: 0.2rem 0 0;
+  color: var(--color-text-muted);
+}
+
+.task-comments__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.task-comments__form textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem;
+  font-size: 0.8rem;
+  resize: vertical;
+}
+
+/* Admin miembros proyecto */
+.miembros-admin {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.miembros-admin select {
+  flex: 1;
+  min-width: 12rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.miembros-admin__row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}

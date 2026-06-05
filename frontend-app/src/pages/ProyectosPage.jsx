@@ -8,6 +8,7 @@ import Button from '../components/ui/Button'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
 import { daysUntil, formatDate, isProyectoAtrasado } from '../utils/projectDates'
 import { formatCLP, formatMargen, margenBadgeClass } from '../utils/money'
+import { isAdmin } from '../auth/roles'
 
 const ESTADOS = ['PLANIFICADO', 'EN_PROGRESO', 'COMPLETADO', 'CANCELADO']
 
@@ -40,9 +41,23 @@ export default function ProyectosPage() {
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
 
+  const admin = isAdmin()
+
   const loadData = useCallback(() => {
     setLoading(true)
     setError('')
+    if (!admin) {
+      return api.getMiPanel()
+        .then((panel) => {
+          const ids = new Set((panel?.proyectos ?? []).map((p) => p.id))
+          return api.getProyectos().then((all) => {
+            setProyectos(all.filter((p) => ids.has(p.id)))
+            setTrabajadores(panel?.perfil ? [panel.perfil] : [])
+          })
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false))
+    }
     return Promise.all([api.getProyectos(), api.getTrabajadores()])
       .then(([proyectosData, trabajadoresData]) => {
         setProyectos(proyectosData)
@@ -50,7 +65,7 @@ export default function ProyectosPage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
-  }, [])
+  }, [admin])
 
   useEffect(() => {
     loadData()
@@ -154,12 +169,14 @@ export default function ProyectosPage() {
       <FlashMessage message={flash} type={flashType} onClose={() => setFlash('')} />
 
       <PageHeader
-        title="Proyectos"
-        subtitle="Boards de innovación tecnológica con responsables asignados"
-        actions={<Button onClick={openCreate}>+ Nuevo proyecto</Button>}
+        title={admin ? 'Proyectos' : 'Mis proyectos'}
+        subtitle={admin
+          ? 'Boards de innovación tecnológica con responsables asignados'
+          : 'Proyectos donde tienes tareas asignadas (solo lectura)'}
+        actions={admin ? <Button onClick={openCreate}>+ Nuevo proyecto</Button> : null}
       />
 
-      {showForm && (
+      {admin && showForm && (
         <form className="form-card form-card--animated" onSubmit={handleSubmit}>
           <h4>{editingId ? 'Editar proyecto' : 'Nuevo proyecto'}</h4>
           <div className="form-grid">
@@ -209,7 +226,9 @@ export default function ProyectosPage() {
       {loading && <LoadingSkeleton variant="card" rows={4} />}
       {!loading && error && <FlashMessage message={error} type="error" />}
       {!loading && !error && proyectos.length === 0 && (
-        <p className="empty-state">No hay proyectos. Crea el primero con el botón superior.</p>
+        <p className="empty-state">
+          {admin ? 'No hay proyectos. Crea el primero con el botón superior.' : 'No tienes proyectos con tareas asignadas.'}
+        </p>
       )}
       {!loading && !error && proyectos.length > 0 && (
         <div className="proyecto-cards">
@@ -234,7 +253,7 @@ export default function ProyectosPage() {
                   <h3>{p.nombre}</h3>
                   <div className="proyecto-card__badges">
                     <span className="badge badge--info">{p.estado?.replace('_', ' ')}</span>
-                    {p.margenPorcentaje != null && (
+                    {admin && p.margenPorcentaje != null && (
                       <span className={`badge ${margenBadgeClass(p.margenPorcentaje)}`}>
                         {formatMargen(p.margenPorcentaje)}
                       </span>
@@ -244,10 +263,10 @@ export default function ProyectosPage() {
                 <p className="proyecto-card__desc">{p.descripcion}</p>
                 <div className="proyecto-card__meta">
                   <span>Responsable: {trabajadorLabel(p.responsableId)}</span>
-                  {p.ingresosContrato != null && (
+                  {admin && p.ingresosContrato != null && (
                     <span>Ingresos: {formatCLP(p.ingresosContrato)}</span>
                   )}
-                  {p.presupuesto != null && (
+                  {admin && p.presupuesto != null && (
                     <span>Presupuesto: {formatCLP(p.presupuesto)}</span>
                   )}
                   {(p.fechaInicio || p.fechaFin) && (
@@ -258,14 +277,16 @@ export default function ProyectosPage() {
                   )}
                 </div>
                 {atrasado && <span className="badge badge--danger">Atrasado</span>}
-                <div className="proyecto-card__actions" onClick={(e) => e.stopPropagation()}>
-                  <Button variant="secondary" size="sm" type="button" onClick={(e) => openEdit(p, e)}>
-                    Editar
-                  </Button>
-                  <Button variant="danger" size="sm" type="button" onClick={() => setDeleteTarget(p)}>
-                    Eliminar
-                  </Button>
-                </div>
+                {admin && (
+                  <div className="proyecto-card__actions" onClick={(e) => e.stopPropagation()}>
+                    <Button variant="secondary" size="sm" type="button" onClick={(e) => openEdit(p, e)}>
+                      Editar
+                    </Button>
+                    <Button variant="danger" size="sm" type="button" onClick={() => setDeleteTarget(p)}>
+                      Eliminar
+                    </Button>
+                  </div>
+                )}
               </article>
             )
           })}

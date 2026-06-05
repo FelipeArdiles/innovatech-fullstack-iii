@@ -24,7 +24,9 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
     container_name: innovatech-keycloak
-    command: start-dev --import-realm
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - "/opt/keycloak/bin/kc.sh import --dir /opt/keycloak/data/import --override true && exec /opt/keycloak/bin/kc.sh start-dev"
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
@@ -35,7 +37,7 @@ services:
       KC_HOSTNAME_STRICT_HTTPS: "false"
       KC_HTTP_ENABLED: "true"
     volumes:
-      - ./docker/keycloak/realm-innovatech.json:/opt/keycloak/data/import/realm-innovatech.json
+      - ./docker/keycloak/realm-innovatech.json:/opt/keycloak/data/import/innovatech-realm.json
     ports:
       - "8180:8180"
     networks:
@@ -64,6 +66,26 @@ services:
       timeout: 5s
       retries: 10
       start_period: 40s
+
+  db-bootstrap:
+    image: postgres:16-alpine
+    container_name: innovatech-db-bootstrap
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:-innovatech_dev}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        for db in usuarios proyectos tareas notificaciones; do
+          psql -h postgres -U ${POSTGRES_USER:-innovatech} -d innovatech -tc "SELECT 1 FROM pg_database WHERE datname='$$db'" | grep -q 1 \
+            || psql -h postgres -U ${POSTGRES_USER:-innovatech} -d innovatech -c "CREATE DATABASE $$db;"
+        done
+        echo "Bases de datos verificadas"
+    networks:
+      - innovatech-net
+    restart: "no"
 
   ms-usuarios:
     build:
@@ -122,6 +144,27 @@ services:
     networks:
       - innovatech-net
 
+  ms-notificaciones:
+    build:
+      context: ./ms-notificaciones
+      dockerfile: Dockerfile
+    container_name: innovatech-ms-notificaciones
+    environment:
+      SERVER_PORT: 8085
+      EUREKA_URL: http://eureka-server:8761/eureka/
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER: ${POSTGRES_USER:-innovatech}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-innovatech_dev}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - innovatech-net
+
   bff-gateway:
     build:
       context: ./bff-gateway
@@ -138,6 +181,8 @@ services:
       ms-proyectos:
         condition: service_started
       ms-tareas:
+        condition: service_started
+      ms-notificaciones:
         condition: service_started
     networks:
       - innovatech-net

@@ -1,6 +1,9 @@
 package cl.innovatech.bff_gateway.client;
 
+import cl.innovatech.bff_gateway.dto.ComentarioTareaDto;
+import cl.innovatech.bff_gateway.dto.NotificacionDto;
 import cl.innovatech.bff_gateway.dto.ProyectoDto;
+import cl.innovatech.bff_gateway.dto.ProyectoMiembroDto;
 import cl.innovatech.bff_gateway.dto.TareaDto;
 import cl.innovatech.bff_gateway.dto.UsuarioDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -18,11 +21,13 @@ public class MicroserviceClient {
 	private final RestClient usuariosClient;
 	private final RestClient proyectosClient;
 	private final RestClient tareasClient;
+	private final RestClient notificacionesClient;
 
 	public MicroserviceClient(@Qualifier("loadBalancedRestClientBuilder") RestClient.Builder restClientBuilder) {
 		this.usuariosClient = restClientBuilder.baseUrl("http://ms-usuarios").build();
 		this.proyectosClient = restClientBuilder.baseUrl("http://ms-proyectos").build();
 		this.tareasClient = restClientBuilder.baseUrl("http://ms-tareas").build();
+		this.notificacionesClient = restClientBuilder.baseUrl("http://ms-notificaciones").build();
 	}
 
 	@CircuitBreaker(name = "msUsuarios", fallbackMethod = "usuariosFallback")
@@ -160,6 +165,117 @@ public class MicroserviceClient {
 			.toBodilessEntity();
 	}
 
+	@CircuitBreaker(name = "msProyectos", fallbackMethod = "miembrosFallback")
+	public List<ProyectoMiembroDto> getMiembrosProyecto(Long proyectoId) {
+		return proyectosClient.get()
+			.uri("/api/proyectos/{proyectoId}/miembros", proyectoId)
+			.retrieve()
+			.body(new ParameterizedTypeReference<>() {});
+	}
+
+	@CircuitBreaker(name = "msProyectos", fallbackMethod = "miembrosFallback")
+	public List<ProyectoMiembroDto> getMiembrosPorTrabajador(Long trabajadorId) {
+		return proyectosClient.get()
+			.uri(uriBuilder -> uriBuilder
+				.path("/api/proyectos/miembros/trabajador")
+				.queryParam("trabajadorId", trabajadorId)
+				.build())
+			.retrieve()
+			.body(new ParameterizedTypeReference<>() {});
+	}
+
+	@CircuitBreaker(name = "msProyectos", fallbackMethod = "miembroFallback")
+	public ProyectoMiembroDto agregarMiembro(Long proyectoId, Long trabajadorId) {
+		return proyectosClient.post()
+			.uri("/api/proyectos/{proyectoId}/miembros", proyectoId)
+			.body(java.util.Map.of("trabajadorId", trabajadorId))
+			.retrieve()
+			.body(ProyectoMiembroDto.class);
+	}
+
+	@CircuitBreaker(name = "msProyectos")
+	public void quitarMiembro(Long proyectoId, Long trabajadorId) {
+		proyectosClient.delete()
+			.uri("/api/proyectos/{proyectoId}/miembros/{trabajadorId}", proyectoId, trabajadorId)
+			.retrieve()
+			.toBodilessEntity();
+	}
+
+	@CircuitBreaker(name = "msNotificaciones", fallbackMethod = "comentariosFallback")
+	public List<ComentarioTareaDto> getComentarios(Long tareaId) {
+		return notificacionesClient.get()
+			.uri(uriBuilder -> uriBuilder
+				.path("/api/comentarios")
+				.queryParam("tareaId", tareaId)
+				.build())
+			.retrieve()
+			.body(new ParameterizedTypeReference<>() {});
+	}
+
+	@CircuitBreaker(name = "msNotificaciones", fallbackMethod = "comentarioFallback")
+	public ComentarioTareaDto createComentario(ComentarioTareaDto comentario) {
+		return notificacionesClient.post()
+			.uri("/api/comentarios")
+			.body(comentario)
+			.retrieve()
+			.body(ComentarioTareaDto.class);
+	}
+
+	@CircuitBreaker(name = "msNotificaciones", fallbackMethod = "notificacionesFallback")
+	public List<NotificacionDto> getNotificaciones(Long destinatarioId) {
+		return notificacionesClient.get()
+			.uri(uriBuilder -> uriBuilder
+				.path("/api/notificaciones")
+				.queryParam("destinatarioId", destinatarioId)
+				.build())
+			.retrieve()
+			.body(new ParameterizedTypeReference<>() {});
+	}
+
+	@CircuitBreaker(name = "msNotificaciones", fallbackMethod = "pendientesFallback")
+	public long getNotificacionesPendientes(Long destinatarioId) {
+		java.util.Map<String, Long> body = notificacionesClient.get()
+			.uri(uriBuilder -> uriBuilder
+				.path("/api/notificaciones/pendientes")
+				.queryParam("destinatarioId", destinatarioId)
+				.build())
+			.retrieve()
+			.body(new ParameterizedTypeReference<>() {});
+		return body != null ? body.getOrDefault("count", 0L) : 0L;
+	}
+
+	@CircuitBreaker(name = "msNotificaciones")
+	public void createNotificacionesBatch(List<NotificacionDto> notificaciones) {
+		if (notificaciones == null || notificaciones.isEmpty()) {
+			return;
+		}
+		notificacionesClient.post()
+			.uri("/api/notificaciones/batch")
+			.body(notificaciones)
+			.retrieve()
+			.toBodilessEntity();
+	}
+
+	@CircuitBreaker(name = "msNotificaciones", fallbackMethod = "notificacionFallback")
+	public NotificacionDto marcarNotificacionLeida(Long id) {
+		return notificacionesClient.patch()
+			.uri("/api/notificaciones/{id}/leida", id)
+			.retrieve()
+			.body(NotificacionDto.class);
+	}
+
+	@CircuitBreaker(name = "msNotificaciones")
+	public int marcarTodasNotificacionesLeidas(Long destinatarioId) {
+		java.util.Map<String, Integer> body = notificacionesClient.patch()
+			.uri(uriBuilder -> uriBuilder
+				.path("/api/notificaciones/marcar-todas")
+				.queryParam("destinatarioId", destinatarioId)
+				.build())
+			.retrieve()
+			.body(new ParameterizedTypeReference<>() {});
+		return body != null ? body.getOrDefault("marcadas", 0) : 0;
+	}
+
 	@SuppressWarnings("unused")
 	private List<UsuarioDto> usuariosFallback(Throwable ex) {
 		return List.of();
@@ -187,6 +303,41 @@ public class MicroserviceClient {
 
 	@SuppressWarnings("unused")
 	private TareaDto tareaFallback(Throwable ex) {
+		return null;
+	}
+
+	@SuppressWarnings("unused")
+	private List<ProyectoMiembroDto> miembrosFallback(Throwable ex) {
+		return List.of();
+	}
+
+	@SuppressWarnings("unused")
+	private ProyectoMiembroDto miembroFallback(Throwable ex) {
+		return null;
+	}
+
+	@SuppressWarnings("unused")
+	private List<ComentarioTareaDto> comentariosFallback(Throwable ex) {
+		return List.of();
+	}
+
+	@SuppressWarnings("unused")
+	private ComentarioTareaDto comentarioFallback(Throwable ex) {
+		return null;
+	}
+
+	@SuppressWarnings("unused")
+	private List<NotificacionDto> notificacionesFallback(Throwable ex) {
+		return List.of();
+	}
+
+	@SuppressWarnings("unused")
+	private long pendientesFallback(Throwable ex) {
+		return 0L;
+	}
+
+	@SuppressWarnings("unused")
+	private NotificacionDto notificacionFallback(Throwable ex) {
 		return null;
 	}
 }

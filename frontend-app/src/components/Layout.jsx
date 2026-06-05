@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { getUsername, logout } from '../auth/keycloak'
+import { getAccountTypeLabel, getAccountBadgeClass, isAdmin } from '../auth/roles'
 import { NavIcon } from './icons/NavIcons'
 import Button from './ui/Button'
 import AnimatedOutlet from './AnimatedOutlet'
+import NotificationBell from './NotificationBell'
 
-const navItems = [
+const adminNavItems = [
   { to: '/', label: 'Inicio', icon: 'home', end: true },
   { to: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { to: '/trabajadores', label: 'Trabajadores', icon: 'workers' },
@@ -15,8 +17,17 @@ const navItems = [
   { to: '/tareas', label: 'Tablero Trello', icon: 'tasks' },
 ]
 
+const workerNavItems = [
+  { to: '/', label: 'Inicio', icon: 'home', end: true },
+  { to: '/dashboard', label: 'Mi panel', icon: 'dashboard' },
+  { to: '/proyectos', label: 'Mis proyectos', icon: 'projects' },
+  { to: '/tareas', label: 'Mis tareas', icon: 'tasks' },
+]
+
 export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const admin = isAdmin()
+  const navItems = admin ? adminNavItems : workerNavItems
 
   function closeSidebar() {
     setSidebarOpen(false)
@@ -46,6 +57,10 @@ export default function Layout() {
           >
             <NavIcon name="close" />
           </button>
+        </div>
+
+        <div className={`sidebar__role-pill ${getAccountBadgeClass()}`}>
+          Cuenta: {getAccountTypeLabel()}
         </div>
 
         <nav className="sidebar__nav">
@@ -87,9 +102,12 @@ export default function Layout() {
             <NavIcon name="menu" />
           </button>
           <div>
-            <h2>Gestión integral de proyectos tecnológicos</h2>
-            <p className="main__subtitle">Panel Innovatech Solutions · demo</p>
+            <h2>{admin ? 'Gestión integral de proyectos tecnológicos' : 'Panel del colaborador'}</h2>
+            <p className="main__subtitle">
+              Innovatech Solutions · <span className={`badge ${getAccountBadgeClass()}`}>{getAccountTypeLabel()}</span>
+            </p>
           </div>
+          <NotificationBell />
         </header>
         <main className="main__content">
           <AnimatedOutlet />

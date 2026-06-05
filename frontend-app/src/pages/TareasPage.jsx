@@ -7,6 +7,8 @@ import PageHeader from '../components/ui/PageHeader'
 import Button from '../components/ui/Button'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
 import { formatCLP } from '../utils/money'
+import { isAdmin } from '../auth/roles'
+import TaskComments from '../components/TaskComments'
 
 const COLUMNAS = [
   { estado: 'POR_HACER', titulo: 'Por hacer', accent: 'todo' },
@@ -53,11 +55,31 @@ export default function TareasPage() {
   const [deleting, setDeleting] = useState(false)
   const [draggingId, setDraggingId] = useState(null)
   const [dropTarget, setDropTarget] = useState(null)
+  const [commentsOpenId, setCommentsOpenId] = useState(null)
+
+  const admin = isAdmin()
 
   const loadData = useCallback(() => {
     setLoading(true)
     setError('')
     const proyectoId = filtroProyecto !== '' ? Number(filtroProyecto) : undefined
+    if (!admin) {
+      return api.getMiPanel()
+        .then((panel) => {
+          const perfilId = panel?.perfil?.id
+          const proyectoIds = new Set((panel?.proyectos ?? []).map((p) => p.id))
+          return api.getTareas(proyectoId).then((tareasData) => {
+            const mine = tareasData.filter((t) => t.asignadoId === perfilId)
+            setTareas(mine)
+            return api.getProyectos().then((all) => {
+              setProyectos(all.filter((p) => proyectoIds.has(p.id)))
+              setTrabajadores(panel?.perfil ? [panel.perfil] : [])
+            })
+          })
+        })
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false))
+    }
     return Promise.all([
       api.getTareas(proyectoId),
       api.getProyectos(),
@@ -70,7 +92,7 @@ export default function TareasPage() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
-  }, [filtroProyecto])
+  }, [filtroProyecto, admin])
 
   useEffect(() => {
     setFiltroProyecto(proyectoFromUrl)
@@ -239,8 +261,10 @@ export default function TareasPage() {
       <FlashMessage message={flash} type={flashType} onClose={() => setFlash('')} />
 
       <PageHeader
-        title="Tablero Trello"
-        subtitle="Arrastra tarjetas entre columnas o edítalas con CRUD completo"
+        title={admin ? 'Tablero Trello' : 'Mis tareas'}
+        subtitle={admin
+          ? 'Arrastra tarjetas entre columnas o edítalas con CRUD completo'
+          : 'Solo tus tareas asignadas — puedes mover estado en el tablero'}
         actions={
           <>
             <select
@@ -248,17 +272,17 @@ export default function TareasPage() {
               value={filtroProyecto}
               onChange={(e) => handleFiltroProyecto(e.target.value)}
             >
-              <option value="">Todos los proyectos</option>
+              <option value="">{admin ? 'Todos los proyectos' : 'Mis proyectos'}</option>
               {proyectos.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
               ))}
             </select>
-            <Button onClick={() => openCreate()}>+ Nueva tarea</Button>
+            {admin && <Button onClick={() => openCreate()}>+ Nueva tarea</Button>}
           </>
         }
       />
 
-      {showForm && (
+      {admin && showForm && (
         <form className="form-card form-card--animated" onSubmit={handleSubmit}>
           <h4>{editingId ? 'Editar tarea' : 'Nueva tarea'}</h4>
           <div className="form-grid">
@@ -362,14 +386,21 @@ export default function TareasPage() {
                           <span className="detail-meta">{formatCLP(tarea.valorMonetario)}</span>
                         )}
                       </div>
-                      <div className="kanban-card__actions">
-                        <Button variant="ghost" size="sm" type="button" onClick={() => openEdit(tarea)}>
-                          Editar
-                        </Button>
-                        <Button variant="danger" size="sm" type="button" onClick={() => setDeleteTarget(tarea)}>
-                          ×
-                        </Button>
-                      </div>
+                      <TaskComments
+                        tareaId={tarea.id}
+                        expanded={commentsOpenId === tarea.id}
+                        onToggle={() => setCommentsOpenId((prev) => (prev === tarea.id ? null : tarea.id))}
+                      />
+                      {admin && (
+                        <div className="kanban-card__actions">
+                          <Button variant="ghost" size="sm" type="button" onClick={() => openEdit(tarea)}>
+                            Editar
+                          </Button>
+                          <Button variant="danger" size="sm" type="button" onClick={() => setDeleteTarget(tarea)}>
+                            ×
+                          </Button>
+                        </div>
+                      )}
                     </article>
                   ))}
                   <button

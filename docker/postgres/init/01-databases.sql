@@ -2,3 +2,4 @@
 CREATE DATABASE usuarios;
 CREATE DATABASE proyectos;
 CREATE DATABASE tareas;
+CREATE DATABASE notificaciones;
