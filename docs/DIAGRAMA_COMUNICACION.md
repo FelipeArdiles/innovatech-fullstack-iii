@@ -2,6 +2,66 @@
 
 Documento de referencia sobre cómo se comunican los módulos del sistema Innovatech Solutions: frontend, autenticación, gateway, BFF, microservicios, service discovery y persistencia.
 
+## Diagrama gráfico (SVG)
+
+Abre en el navegador o en el preview del IDE:
+
+![Arquitectura lógica](assets/arquitectura-logica.svg)
+
+Archivo: [`docs/assets/arquitectura-logica.svg`](assets/arquitectura-logica.svg)
+
+## Vista lógica por capas
+
+```mermaid
+flowchart LR
+    subgraph L1["1. Usuario"]
+        U((Usuario))
+    end
+
+    subgraph L2["2. Presentacion"]
+        FE[Frontend React]
+        KC[Keycloak JWT]
+    end
+
+    subgraph L3["3. Borde"]
+        AG[API Gateway]
+    end
+
+    subgraph L4["4. Orquestacion"]
+        BFF[BFF + Circuit Breaker]
+    end
+
+    subgraph L5["5. Dominio"]
+        MSU[ms-usuarios]
+        MSP[ms-proyectos]
+        MST[ms-tareas]
+    end
+
+    subgraph L6["6. Datos"]
+        PG[(PostgreSQL)]
+    end
+
+    EU[Eureka]
+
+    U --> FE
+    FE --> KC
+    FE -->|Bearer JWT| AG
+    AG --> BFF
+    AG -.->|rutas directas| MST
+    AG -.->|trabajadores| MSU
+    BFF --> MSU
+    BFF --> MSP
+    BFF --> MST
+    MSU --> PG
+    MSP --> PG
+    MST --> PG
+    BFF -.-> EU
+    AG -.-> EU
+    MSU -.-> EU
+    MSP -.-> EU
+    MST -.-> EU
+```
+
 ## Diagrama de arquitectura
 
 ```mermaid
