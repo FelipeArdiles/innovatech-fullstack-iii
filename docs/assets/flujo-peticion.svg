@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 480" font-family="system-ui, Arial, sans-serif">
+  <defs>
+    <marker id="arrow-slate" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#334155"/>
+    </marker>
+    <marker id="arrow-indigo" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4f46e5"/>
+    </marker>
+    <marker id="arrow-return" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#059669"/>
+    </marker>
+    <linearGradient id="boxGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+  </defs>
+
+  <text x="550" y="32" text-anchor="middle" font-size="18" font-weight="bold" fill="#0f172a">Flujo de petici&#243;n: usuario a respuesta en UI</text>
+  <text x="550" y="54" text-anchor="middle" font-size="12" fill="#64748b">GET /api/proyectos (v&#237;a BFF) &#183; POST /api/tareas omite BFF</text>
+
+  <rect x="30" y="72" width="90" height="32" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="75" y="93" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">INICIO</text>
+
+  <rect x="140" y="100" width="100" height="48" rx="8" fill="url(#boxGrad)" stroke="#475569" stroke-width="1.5"/>
+  <text x="190" y="122" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e293b">Usuario</text>
+  <text x="190" y="138" text-anchor="middle" font-size="10" fill="#64748b">Acci&#243;n en UI</text>
+
+  <rect x="270" y="100" width="100" height="48" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="320" y="122" text-anchor="middle" font-size="12" font-weight="bold" fill="#312e81">Frontend</text>
+  <text x="320" y="138" text-anchor="middle" font-size="10" fill="#6366f1">React :5173</text>
+
+  <rect x="400" y="100" width="110" height="48" rx="8" fill="url(#boxGrad)" stroke="#475569" stroke-width="1.5"/>
+  <text x="455" y="122" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e293b">API Gateway</text>
+  <text x="455" y="138" text-anchor="middle" font-size="10" fill="#64748b">:8080 + JWT</text>
+
+  <rect x="540" y="100" width="100" height="48" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="590" y="122" text-anchor="middle" font-size="12" font-weight="bold" fill="#312e81">BFF / MS</text>
+  <text x="590" y="138" text-anchor="middle" font-size="10" fill="#6366f1">:8081 / :8083</text>
+
+  <rect x="670" y="100" width="110" height="48" rx="8" fill="url(#boxGrad)" stroke="#475569" stroke-width="1.5"/>
+  <text x="725" y="122" text-anchor="middle" font-size="12" font-weight="bold" fill="#1e293b">PostgreSQL</text>
+  <text x="725" y="138" text-anchor="middle" font-size="10" fill="#64748b">:5432 JDBC</text>
+
+  <line x1="75" y1="88" x2="140" y2="110" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-return)"/>
+
+  <line x1="240" y1="124" x2="270" y2="124" stroke="#334155" stroke-width="2" marker-end="url(#arrow-slate)"/>
+  <circle cx="255" cy="124" r="10" fill="#4f46e5"/>
+  <text x="255" y="128" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">1</text>
+
+  <line x1="370" y1="124" x2="400" y2="124" stroke="#334155" stroke-width="2" marker-end="url(#arrow-slate)"/>
+  <circle cx="385" cy="124" r="10" fill="#4f46e5"/>
+  <text x="385" y="128" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">2</text>
+  <text x="385" y="112" text-anchor="middle" font-size="8" fill="#4f46e5">HTTP + JWT</text>
+
+  <line x1="510" y1="124" x2="540" y2="124" stroke="#334155" stroke-width="2" marker-end="url(#arrow-slate)"/>
+  <circle cx="525" cy="124" r="10" fill="#4f46e5"/>
+  <text x="525" y="128" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">3</text>
+
+  <line x1="640" y1="124" x2="670" y2="124" stroke="#334155" stroke-width="2" marker-end="url(#arrow-slate)"/>
+  <circle cx="655" cy="124" r="10" fill="#4f46e5"/>
+  <text x="655" y="128" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">4</text>
+  <text x="655" y="112" text-anchor="middle" font-size="8" fill="#4f46e5">JDBC</text>
+
+  <rect x="400" y="168" width="110" height="40" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <text x="455" y="186" text-anchor="middle" font-size="11" font-weight="bold" fill="#c2410c">Keycloak</text>
+  <text x="455" y="200" text-anchor="middle" font-size="9" fill="#ea580c">Validaci&#243;n JWT</text>
+  <line x1="455" y1="148" x2="455" y2="168" stroke="#ea580c" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow-slate)"/>
+
+  <line x1="30" y1="230" x2="1070" y2="230" stroke="#e2e8f0" stroke-width="2"/>
+  <text x="550" y="252" text-anchor="middle" font-size="13" font-weight="bold" fill="#059669">Vuelta: JSON por la misma cadena (pasos 5 a 8)</text>
+
+  <line x1="725" y1="270" x2="590" y2="270" stroke="#059669" stroke-width="2" marker-end="url(#arrow-return)"/>
+  <circle cx="658" cy="270" r="10" fill="#059669"/>
+  <text x="658" y="274" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">5</text>
+  <text x="658" y="258" text-anchor="middle" font-size="8" fill="#059669">Filas</text>
+
+  <line x1="540" y1="270" x2="455" y2="270" stroke="#059669" stroke-width="2" marker-end="url(#arrow-return)"/>
+  <circle cx="498" cy="270" r="10" fill="#059669"/>
+  <text x="498" y="274" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">6</text>
+  <text x="498" y="258" text-anchor="middle" font-size="8" fill="#059669">JSON</text>
+
+  <line x1="400" y1="270" x2="320" y2="270" stroke="#059669" stroke-width="2" marker-end="url(#arrow-return)"/>
+  <circle cx="360" cy="270" r="10" fill="#059669"/>
+  <text x="360" y="274" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">7</text>
+  <text x="360" y="258" text-anchor="middle" font-size="8" fill="#059669">200 / 201</text>
+
+  <line x1="270" y1="270" x2="190" y2="270" stroke="#059669" stroke-width="2" marker-end="url(#arrow-return)"/>
+  <circle cx="230" cy="270" r="10" fill="#059669"/>
+  <text x="230" y="274" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffffff">8</text>
+  <text x="230" y="258" text-anchor="middle" font-size="8" fill="#059669">Render UI</text>
+
+  <rect x="140" y="310" width="90" height="32" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="185" y="331" text-anchor="middle" font-size="12" font-weight="bold" fill="#166534">FIN</text>
+  <line x1="190" y1="270" x2="185" y2="310" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-return)"/>
+
+  <rect x="540" y="350" width="520" height="52" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="800" y="372" text-anchor="middle" font-size="11" font-weight="bold" fill="#334155">POST /api/tareas: atajo directo Gateway a ms-tareas (sin BFF)</text>
+  <text x="800" y="390" text-anchor="middle" font-size="10" fill="#64748b">Pasos 3 (BFF) omitidos en la ida y en la vuelta</text>
+
+  <rect x="30" y="420" width="1040" height="32" rx="6" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="50" y="441" font-size="10" fill="#475569">Leyenda: ida (slate/indigo) &#183; vuelta (verde) &#183; JWT (punteado) &#183; Fuente: DIAGRAMA_FLUJO_PETICION.md</text>
+</svg>

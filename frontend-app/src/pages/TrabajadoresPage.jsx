@@ -5,6 +5,7 @@ import ConfirmModal from '../components/ConfirmModal'
 import PageHeader from '../components/ui/PageHeader'
 import Button from '../components/ui/Button'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
+import { formatCLP } from '../utils/money'
 
 const EMPTY_FORM = { nombre: '', rol: '', email: '', capacidadHoras: '' }
 
@@ -140,7 +141,7 @@ export default function TrabajadoresPage() {
 
       <PageHeader
         title="Trabajadores"
-        subtitle="Equipo y capacidad semanal (CRUD completo)"
+        subtitle="Equipo, sueldos mensuales (CLP) y capacidad semanal"
         actions={
           <Button onClick={openCreate}>+ Nuevo trabajador</Button>
         }
@@ -202,6 +203,7 @@ export default function TrabajadoresPage() {
                 <th>Nombre</th>
                 <th>Rol</th>
                 <th>Email</th>
+                <th>Sueldo mensual (CLP)</th>
                 <th>Capacidad</th>
                 <th>Acciones</th>
               </tr>
@@ -213,6 +215,7 @@ export default function TrabajadoresPage() {
                   <td>{t.nombre}</td>
                   <td><span className="badge">{t.rol}</span></td>
                   <td>{t.email}</td>
+                  <td>{formatCLP(t.sueldoMensualClp)}</td>
                   <td>{t.capacidadHoras} h/sem</td>
                   <td className="actions-cell">
                     <Button variant="secondary" size="sm" type="button" onClick={() => openEdit(t)}>

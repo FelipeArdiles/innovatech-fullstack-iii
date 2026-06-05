@@ -6,6 +6,7 @@ import ConfirmModal from '../components/ConfirmModal'
 import PageHeader from '../components/ui/PageHeader'
 import Button from '../components/ui/Button'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
+import { formatCLP } from '../utils/money'
 
 const COLUMNAS = [
   { estado: 'POR_HACER', titulo: 'Por hacer', accent: 'todo' },
@@ -351,6 +352,15 @@ export default function TareasPage() {
                       <div className="kanban-card__meta">
                         <span className="badge badge--soft">{proyectoLabel(tarea.proyectoId)}</span>
                         <span>{trabajadorLabel(tarea.asignadoId)}</span>
+                        {tarea.dificultad && (
+                          <span className="badge">{tarea.dificultad}</span>
+                        )}
+                        {tarea.horasEstimadas != null && (
+                          <span className="detail-meta">{tarea.horasEstimadas} h</span>
+                        )}
+                        {tarea.valorMonetario != null && (
+                          <span className="detail-meta">{formatCLP(tarea.valorMonetario)}</span>
+                        )}
                       </div>
                       <div className="kanban-card__actions">
                         <Button variant="ghost" size="sm" type="button" onClick={() => openEdit(tarea)}>

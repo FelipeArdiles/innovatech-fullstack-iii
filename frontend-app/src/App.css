@@ -1204,6 +1204,12 @@
   color: var(--color-text-muted);
 }
 
+.fin-label-tip {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
 .fin-portfolio {
   display: flex;
   flex-direction: column;

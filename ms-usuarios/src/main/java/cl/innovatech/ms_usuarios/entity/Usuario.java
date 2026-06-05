@@ -18,4 +18,6 @@ public class Usuario {
 	private String rol;
 	private String email;
 	private Integer capacidadHoras;
+	/** Sueldo líquido mensual referencial en pesos chilenos (CLP). */
+	private Long sueldoMensualClp;
 }

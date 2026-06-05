@@ -5,6 +5,7 @@ import PageHeader from '../components/ui/PageHeader'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
 import CapacityChart from '../components/charts/CapacityChart'
 import ProgressRing from '../components/charts/ProgressRing'
+import { formatCLP } from '../utils/money'
 
 export default function CapacidadPage() {
   const [data, setData] = useState(null)
@@ -57,6 +58,16 @@ export default function CapacidadPage() {
               <strong className="summary-card__value">{data.trabajadoresSobrecargados}</strong>
               <span className="summary-card__hint">trabajador(es) &gt;100%</span>
             </article>
+            <article className="summary-card">
+              <span className="summary-card__label">Nómina mensual (CLP)</span>
+              <strong className="summary-card__value">{formatCLP(data.costoMensualNominaClp)}</strong>
+              <span className="summary-card__hint">Sueldos líquidos del equipo</span>
+            </article>
+            <article className="summary-card">
+              <span className="summary-card__label">Costo horas asignadas (CLP)</span>
+              <strong className="summary-card__value">{formatCLP(data.costoHorasAsignadasClp)}</strong>
+              <span className="summary-card__hint">Prorrateo semanal por tareas</span>
+            </article>
           </div>
 
           <div className="detail-grid detail-grid--capacity">
@@ -81,8 +92,10 @@ export default function CapacidadPage() {
                 <tr>
                   <th>Trabajador</th>
                   <th>Rol</th>
+                  <th>Sueldo mensual</th>
                   <th>Disponibles</th>
                   <th>Asignadas</th>
+                  <th>Costo asignado</th>
                   <th>Carga %</th>
                   <th>Estado</th>
                 </tr>
@@ -92,8 +105,10 @@ export default function CapacidadPage() {
                   <tr key={t.id} className={t.sobrecargado ? 'row-overload' : ''}>
                     <td>{t.nombre}</td>
                     <td>{t.rol}</td>
+                    <td>{formatCLP(t.sueldoMensualClp)}</td>
                     <td>{t.horasDisponibles} h</td>
                     <td>{t.horasAsignadas} h</td>
+                    <td>{formatCLP(t.costoHorasAsignadasClp)}</td>
                     <td>
                       <span className={t.sobrecargado ? 'text-danger' : ''}>
                         {t.porcentajeCarga}%

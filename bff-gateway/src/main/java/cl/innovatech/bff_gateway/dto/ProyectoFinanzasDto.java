@@ -14,6 +14,9 @@ public class ProyectoFinanzasDto {
 	private Long proyectoId;
 	private String nombreProyecto;
 	private BigDecimal presupuesto;
+	private BigDecimal costoSueldos;
+	private BigDecimal costoTareasOperacional;
+	private BigDecimal otrosGastos;
 	private BigDecimal costoAcumulado;
 	private BigDecimal costoRealRegistrado;
 	private BigDecimal ingresos;

@@ -4,7 +4,7 @@ import { api } from '../api/client'
 import FlashMessage from '../components/FlashMessage'
 import PageHeader from '../components/ui/PageHeader'
 import LoadingSkeleton from '../components/ui/LoadingSkeleton'
-import { formatMargen, formatMoney, margenBadgeClass } from '../utils/money'
+import { formatCLP, formatMargen, margenBadgeClass } from '../utils/money'
 
 export default function FinanzasEmpresaPage() {
   const [resumen, setResumen] = useState(null)
@@ -37,16 +37,16 @@ export default function FinanzasEmpresaPage() {
         <>
           <div className="summary-cards">
             <article className="summary-card">
-              <span className="summary-card__label">Ingresos totales</span>
-              <strong className="summary-card__value">{formatMoney(resumen.ingresosTotales)}</strong>
+              <span className="summary-card__label">Ingresos totales (CLP)</span>
+              <strong className="summary-card__value">{formatCLP(resumen.ingresosTotales)}</strong>
             </article>
             <article className="summary-card">
-              <span className="summary-card__label">Costos totales</span>
-              <strong className="summary-card__value">{formatMoney(resumen.costosTotales)}</strong>
+              <span className="summary-card__label">Costos totales (CLP)</span>
+              <strong className="summary-card__value">{formatCLP(resumen.costosTotales)}</strong>
             </article>
             <article className={`summary-card${Number(resumen.gananciaNeta) >= 0 ? '' : ' summary-card--danger'}`}>
-              <span className="summary-card__label">Ganancia neta</span>
-              <strong className="summary-card__value">{formatMoney(resumen.gananciaNeta)}</strong>
+              <span className="summary-card__label">Ganancia neta (CLP)</span>
+              <strong className="summary-card__value">{formatCLP(resumen.gananciaNeta)}</strong>
               <span className="summary-card__hint">Margen {formatMargen(resumen.margenEmpresaPorcentaje)}</span>
             </article>
             <article className="summary-card">
@@ -65,13 +65,13 @@ export default function FinanzasEmpresaPage() {
                   <div>
                     <strong>{p.nombreProyecto}</strong>
                     <span className="detail-meta">
-                      Costo {formatMoney(p.costoAcumulado)} · Ingreso {formatMoney(p.ingresos)}
+                      Costo {formatCLP(p.costoAcumulado)} · Ingreso {formatCLP(p.ingresos)}
                     </span>
                   </div>
                   <span className={`badge ${margenBadgeClass(p.margenPorcentaje)}`}>
                     {formatMargen(p.margenPorcentaje)}
                   </span>
-                  <span className="detail-meta">{formatMoney(p.ganancia)}</span>
+                  <span className="detail-meta">{formatCLP(p.ganancia)}</span>
                 </Link>
               ))}
             </div>
